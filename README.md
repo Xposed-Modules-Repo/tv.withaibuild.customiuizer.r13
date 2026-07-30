@@ -1,20 +1,8 @@
-# 米客 A13
+# 米客 A13 Kotlin 重构版
 
-[简体中文](https://github.com/Xposed-Modules-Repo/tv.withaibuild.customiuizer.r13/blob/main/README.md) |
-[English](https://github.com/Xposed-Modules-Repo/tv.withaibuild.customiuizer.r13/blob/main/README_EN.md)
+简体中文 | [English](README_EN.md)
 
-面向 **MIUI 14 / Android 13** 的 CustoMIUIzer Kotlin 重构版 Xposed 模块。
-
-本维护版以 [MonwF/customiuizer v23.11.26](https://github.com/MonwF/customiuizer/releases/tag/v23.11.26)
-作为 Android 13 功能语义参考，不是上游官方版本。
-
-本页面用于 LSPosed 模块仓库展示和下载。源码、完整 changelog、构建说明与工程文档位于
-[个人维护仓库](https://github.com/tomthenpc/customiuizer-a13)。
-
-当前版本变化见本仓库的
-[CHANGELOG](https://github.com/Xposed-Modules-Repo/tv.withaibuild.customiuizer.r13/blob/main/CHANGELOG.md)，
-完整工程记录以个人维护仓库为准。主体以 Kotlin 完成工程重构，同时保留经过审计的稳定
-Java/JVM 边界。
+面向 **MIUI 14 / Android 13** 的系统界面与交互定制 Xposed 模块，兼容 libxposed API 101/102，覆盖状态栏、控制中心、锁屏与桌面。
 
 ## 当前正式版
 
@@ -41,7 +29,16 @@ Java/JVM 边界。
 
 Android 14 及更高版本不在本模块支持范围内。不同 MIUI 14 ROM 的 SystemUI、Launcher 和系统应用签名可能不同，部分功能需要单独兼容。
 
-## 维护与 API 边界
+## 维护版说明
+
+本维护版以 [MonwF/customiuizer v23.11.26](https://github.com/MonwF/customiuizer/releases/tag/v23.11.26)
+作为 Android 13 功能语义参考，不是上游官方版本。
+
+本页面用于 LSPosed 模块仓库展示和下载。源码、完整 changelog、构建说明与工程文档位于
+[个人维护仓库](https://github.com/tomthenpc/customiuizer-a13)。当前版本变化见本仓库的
+[CHANGELOG](CHANGELOG.md)，完整工程记录以个人维护仓库为准。
+
+主体以 Kotlin 完成工程重构，同时保留经过审计的稳定 Java/JVM 边界。
 
 - 使用独立包名、版本线、签名和发布流程，不与上游或其他 Android 版本共用安装身份；
 - 使用现代 libxposed API，单一 APK 通过 API 101 公共运行路径与 API 102 元数据兼容 API 101/102 实现；

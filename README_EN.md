@@ -1,25 +1,8 @@
-# CustoMIUIzer A13
+# CustoMIUIzer A13 Kotlin Rebuild
 
-[简体中文](https://github.com/Xposed-Modules-Repo/tv.withaibuild.customiuizer.r13/blob/main/README.md) |
-[English](https://github.com/Xposed-Modules-Repo/tv.withaibuild.customiuizer.r13/blob/main/README_EN.md)
+[简体中文](README.md) | English
 
-A Kotlin-refactored CustoMIUIzer Xposed module for customizing the system UI and interactions on
-**MIUI 14 / Android 13**.
-
-This maintained build uses
-[MonwF/customiuizer v23.11.26](https://github.com/MonwF/customiuizer/releases/tag/v23.11.26)
-as its Android 13 functional reference and is not an official upstream release.
-
-This repository is the LSPosed module listing and download page. Source code, the complete
-changelog, build instructions, and engineering documentation are maintained in the
-[source repository](https://github.com/tomthenpc/customiuizer-a13).
-
-User-visible changes are listed in this repository's
-[CHANGELOG](https://github.com/Xposed-Modules-Repo/tv.withaibuild.customiuizer.r13/blob/main/CHANGELOG.md)
-(Chinese) and
-[CHANGELOG_EN](https://github.com/Xposed-Modules-Repo/tv.withaibuild.customiuizer.r13/blob/main/CHANGELOG_EN.md)
-(English). The source repository remains authoritative for complete engineering records. Kotlin is
-the primary implementation language, while audited, stable Java/JVM boundaries remain.
+A system UI and interaction customization Xposed module for **MIUI 14 / Android 13**, compatible with libxposed API 101/102 and covering the status bar, control center, lock screen, and launcher.
 
 ## Current formal release
 
@@ -46,7 +29,19 @@ the primary implementation language, while audited, stable Java/JVM boundaries r
 
 Android 14 and later are outside this module's support scope. SystemUI, Launcher, and system-app signatures differ between MIUI 14 ROMs, so individual features may require ROM-specific compatibility work.
 
-## Maintenance and API boundary
+## About This Build
+
+This maintained build uses
+[MonwF/customiuizer v23.11.26](https://github.com/MonwF/customiuizer/releases/tag/v23.11.26)
+as its Android 13 functional reference and is not an official upstream release.
+
+This repository is the LSPosed module listing and download page. Source code, the complete
+changelog, build instructions, and engineering documentation are maintained in the
+[source repository](https://github.com/tomthenpc/customiuizer-a13). User-visible changes are
+listed in [CHANGELOG](CHANGELOG.md) (Chinese) and [CHANGELOG_EN](CHANGELOG_EN.md) (English).
+The source repository remains authoritative for complete engineering records.
+
+Kotlin is the primary implementation language, while audited, stable Java/JVM boundaries remain.
 
 - Uses an independent package name, version line, signing identity, and release process instead of sharing an installation identity with upstream or other Android versions.
 - Uses the modern libxposed API. One APK supports API 101/102 implementations through an API 101 public runtime path and API 102 metadata.
