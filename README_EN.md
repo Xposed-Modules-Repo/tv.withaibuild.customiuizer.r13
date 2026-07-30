@@ -1,12 +1,21 @@
-# CustoMIUIzer A13 · Kotlin Refactored Edition
+# CustoMIUIzer A13
 
-[简体中文](README.md) | [English](README_EN.md)
+[简体中文](https://github.com/Xposed-Modules-Repo/tv.withaibuild.customiuizer.r13/blob/main/README.md) |
+[English](https://github.com/Xposed-Modules-Repo/tv.withaibuild.customiuizer.r13/blob/main/README_EN.md)
 
-A Kotlin-refactored Xposed module for system UI and interaction customization on MIUI 14 / Android 13.
+A Kotlin-refactored CustoMIUIzer Xposed module for customizing the system UI and interactions on
+**MIUI 14 / Android 13**.
 
-The current line is primarily Kotlin while retaining audited, stable Java/JVM boundaries; “Kotlin Refactored Edition” does not mean 100% Kotlin.
+This repository is the LSPosed module listing and download page. Source code, the complete
+changelog, build instructions, and engineering documentation are maintained in the
+[source repository](https://github.com/tomthenpc/customiuizer-a13).
 
-This page provides the LSPosed repository listing and downloads. Source code, the complete changelog, build instructions, and engineering documentation are maintained at [tomthenpc/customiuizer-a13](https://github.com/tomthenpc/customiuizer-a13).
+User-visible changes are listed in this repository's
+[CHANGELOG](https://github.com/Xposed-Modules-Repo/tv.withaibuild.customiuizer.r13/blob/main/CHANGELOG.md)
+(Chinese) and
+[CHANGELOG_EN](https://github.com/Xposed-Modules-Repo/tv.withaibuild.customiuizer.r13/blob/main/CHANGELOG_EN.md)
+(English). The source repository remains authoritative for complete engineering records. Kotlin is
+the primary implementation language, while audited, stable Java/JVM boundaries remain.
 
 ## Current formal release
 

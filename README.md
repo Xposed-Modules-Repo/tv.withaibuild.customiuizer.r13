@@ -1,12 +1,17 @@
-# 米客 A13 · Kotlin 重构版
+# 米客 A13
 
-[简体中文](README.md) | [English](README_EN.md)
+[简体中文](https://github.com/Xposed-Modules-Repo/tv.withaibuild.customiuizer.r13/blob/main/README.md) |
+[English](https://github.com/Xposed-Modules-Repo/tv.withaibuild.customiuizer.r13/blob/main/README_EN.md)
 
-面向 MIUI 14 / Android 13 的 Kotlin 重构版系统界面与交互定制 Xposed 模块。
+面向 **MIUI 14 / Android 13** 的 CustoMIUIzer Kotlin 重构版 Xposed 模块。
 
-当前维护线以 Kotlin 为主体，同时保留经过审计的稳定 Java/JVM 边界；“Kotlin 重构版”不表示 100% Kotlin。
+本页面用于 LSPosed 模块仓库展示和下载。源码、完整 changelog、构建说明与工程文档位于
+[个人维护仓库](https://github.com/tomthenpc/customiuizer-a13)。
 
-本页面用于 LSPosed 模块仓库展示和下载；源码、完整 changelog、构建说明与工程文档位于个人维护仓库 [tomthenpc/customiuizer-a13](https://github.com/tomthenpc/customiuizer-a13)。
+当前版本变化见本仓库的
+[CHANGELOG](https://github.com/Xposed-Modules-Repo/tv.withaibuild.customiuizer.r13/blob/main/CHANGELOG.md)，
+完整工程记录以个人维护仓库为准。主体以 Kotlin 完成工程重构，同时保留经过审计的稳定
+Java/JVM 边界。
 
 ## 当前正式版
 
