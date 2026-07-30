@@ -6,6 +6,10 @@
 A Kotlin-refactored CustoMIUIzer Xposed module for customizing the system UI and interactions on
 **MIUI 14 / Android 13**.
 
+This maintained build uses
+[MonwF/customiuizer v23.11.26](https://github.com/MonwF/customiuizer/releases/tag/v23.11.26)
+as its Android 13 functional reference and is not an official upstream release.
+
 This repository is the LSPosed module listing and download page. Source code, the complete
 changelog, build instructions, and engineering documentation are maintained in the
 [source repository](https://github.com/tomthenpc/customiuizer-a13).

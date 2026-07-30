@@ -5,6 +5,9 @@
 
 面向 **MIUI 14 / Android 13** 的 CustoMIUIzer Kotlin 重构版 Xposed 模块。
 
+本维护版以 [MonwF/customiuizer v23.11.26](https://github.com/MonwF/customiuizer/releases/tag/v23.11.26)
+作为 Android 13 功能语义参考，不是上游官方版本。
+
 本页面用于 LSPosed 模块仓库展示和下载。源码、完整 changelog、构建说明与工程文档位于
 [个人维护仓库](https://github.com/tomthenpc/customiuizer-a13)。
 
