@@ -2,7 +2,9 @@
 
 [简体中文](README.md) | [English](README_EN.md)
 
-本仓库是米客 A13（CustoMIUIzer A13）的 LSPosed 模块展示与下载仓库。完整源码、构建说明、工程文档和问题反馈位于 [tomthenpc/customiuizer-a13](https://github.com/tomthenpc/customiuizer-a13)。
+面向 MIUI 14 / Android 13 的系统界面与交互定制 Xposed 模块。
+
+本页面用于 LSPosed 模块仓库展示和下载；源码、完整 changelog、构建说明与工程文档位于个人维护仓库 [tomthenpc/customiuizer-a13](https://github.com/tomthenpc/customiuizer-a13)。
 
 ## 当前正式版
 
@@ -28,6 +30,14 @@
 - 建议框架：LSPosed 2.x / Vector 2.x。
 
 Android 14 及更高版本不在本模块支持范围内。不同 MIUI 14 ROM 的 SystemUI、Launcher 和系统应用签名可能不同，部分功能需要单独兼容。
+
+## 维护与 API 边界
+
+- 使用独立包名、版本线、签名和发布流程，不与上游或其他 Android 版本共用安装身份；
+- 使用现代 libxposed API，单一 APK 通过 API 101 公共运行路径与 API 102 元数据兼容 API 101/102 实现；
+- 不依赖 `de.robv.android.xposed` Legacy Xposed Hook API；
+- 当前验证框架为 LSPosed 2.1.1（7790）；
+- 仅支持 MIUI 14 / Android 13。
 
 ## 功能概览
 
@@ -58,7 +68,7 @@ Android 14 及更高版本不在本模块支持范围内。不同 MIUI 14 ROM �
 
 早期使用不同签名的构建不能直接覆盖安装。若 Android 提示签名不一致，请先备份设置，再卸载旧版本。
 
-证书 DN 保留历史名称 `CN=CustoMIUIzer A14`，但签名者与已测试的 A13 构建一致；保留它是为了升级兼容，不表示本 APK 支持 Android 14。
+证书 DN 保留历史名称 `CN=CustoMIUIzer A14`，但 A13 使用独立包名和版本线，且本次发布没有改变既有 A13 签名者；保留它是为了已测试构建的升级兼容，不表示本 APK 支持 Android 14。
 
 ## 反馈
 

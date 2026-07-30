@@ -2,7 +2,9 @@
 
 [简体中文](README.md) | [English](README_EN.md)
 
-This is the LSPosed listing and download repository for CustoMIUIzer A13. Complete source, build instructions, engineering documentation, and issue tracking are hosted at [tomthenpc/customiuizer-a13](https://github.com/tomthenpc/customiuizer-a13).
+An Xposed module for system UI and interaction customization on MIUI 14 / Android 13.
+
+This page provides the LSPosed repository listing and downloads. Source code, the complete changelog, build instructions, and engineering documentation are maintained at [tomthenpc/customiuizer-a13](https://github.com/tomthenpc/customiuizer-a13).
 
 ## Current formal release
 
@@ -28,6 +30,14 @@ This is the LSPosed listing and download repository for CustoMIUIzer A13. Comple
 - recommended framework: LSPosed 2.x / Vector 2.x.
 
 Android 14 and later are outside this module's support scope. SystemUI, Launcher, and system-app signatures differ between MIUI 14 ROMs, so individual features may require ROM-specific compatibility work.
+
+## Maintenance and API boundary
+
+- Uses an independent package name, version line, signing identity, and release process instead of sharing an installation identity with upstream or other Android versions.
+- Uses the modern libxposed API. One APK supports API 101/102 implementations through an API 101 public runtime path and API 102 metadata.
+- Does not depend on the `de.robv.android.xposed` Legacy Xposed Hook API.
+- The currently validated framework is LSPosed 2.1.1 (7790).
+- Supports MIUI 14 / Android 13 only.
 
 ## Feature overview
 
@@ -58,7 +68,7 @@ See [CHANGELOG_EN.md](CHANGELOG_EN.md) for details.
 
 Early builds signed with a different certificate cannot be upgraded in place. Back up settings and uninstall the old build if Android reports a signature mismatch.
 
-The certificate DN retains the historical label `CN=CustoMIUIzer A14`, while the signer is unchanged from the tested A13 builds. It is retained for upgrade compatibility and does not imply Android 14 support.
+The certificate DN retains the historical label `CN=CustoMIUIzer A14`, while A13 uses an independent package and version line and this release does not change the established A13 signer. It is retained for upgrade compatibility with tested builds and does not imply Android 14 support.
 
 ## Feedback
 
