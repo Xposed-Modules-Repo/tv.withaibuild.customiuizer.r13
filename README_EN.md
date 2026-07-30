@@ -1,8 +1,10 @@
-# CustoMIUIzer A13
+# CustoMIUIzer A13 · Kotlin Refactored Edition
 
 [简体中文](README.md) | [English](README_EN.md)
 
-An Xposed module for system UI and interaction customization on MIUI 14 / Android 13.
+A Kotlin-refactored Xposed module for system UI and interaction customization on MIUI 14 / Android 13.
+
+The current line is primarily Kotlin while retaining audited, stable Java/JVM boundaries; “Kotlin Refactored Edition” does not mean 100% Kotlin.
 
 This page provides the LSPosed repository listing and downloads. Source code, the complete changelog, build instructions, and engineering documentation are maintained at [tomthenpc/customiuizer-a13](https://github.com/tomthenpc/customiuizer-a13).
 
