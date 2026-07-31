@@ -19,6 +19,8 @@ A system UI and interaction customization module for **MIUI 14 / Android 13**.
 | APK SHA-256 | `ABF31CE311253AE863F7B2CEB87BF95140EE706EFF39ADA219033552B6FA7287` |
 | Signing certificate SHA-256 | `C0EFF2DC4E662717195490DA78B12A984C6F2E6BD38ACF4EDAD14D53E3D22E70` |
 
+> This Releases page only keeps the current formal release. Changelog for older versions has been merged into the current Release and CHANGELOG. Older APKs are no longer available for download; the historical source tags remain.
+
 ## r13.8.6 highlights
 
 * Merged the latest A13 maintenance, compatibility diagnostics, scope and UI improvements;

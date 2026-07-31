@@ -1,5 +1,7 @@
 # Changelog
 
+> Note: The Releases page only keeps the current formal release. Full changelogs for older versions are preserved in this file. Older APKs are no longer available for download; historical source tags remain.
+
 ## r13.8.6
 
 * Merged the latest A13 maintenance, compatibility diagnostics, scope and UI improvements;

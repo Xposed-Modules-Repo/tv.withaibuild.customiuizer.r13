@@ -19,6 +19,8 @@
 | APK SHA-256  | `ABF31CE311253AE863F7B2CEB87BF95140EE706EFF39ADA219033552B6FA7287`                  |
 | 签名证书 SHA-256 | `C0EFF2DC4E662717195490DA78B12A984C6F2E6BD38ACF4EDAD14D53E3D22E70`                 |
 
+> Releases 页面仅保留当前正式版。旧版本的变更记录已合并到当前 Release 和 CHANGELOG；旧版 APK 不再提供下载，历史源码 tag 继续保留。
+
 ## r13.8.6 更新重点
 
 * 合并 A13 最新维护、兼容诊断、作用域和 UI 改进；
