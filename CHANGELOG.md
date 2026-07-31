@@ -1,5 +1,27 @@
 # 更新日志
 
+## r13.8.6
+
+* 合并 A13 最新维护、兼容诊断、作用域和 UI 改进；
+* 完善 Hook 目标解析、安装结果记录和兼容回退；
+* 加强 Receiver、Observer、计步器、设备监控和锁屏专辑图生命周期；
+* 优化状态栏、通知、网速、电池、时钟和 Launcher 高频路径；
+* 状态栏网速保留系统字体，并支持双排网速行距调整；
+* 修复设置文本样式继承和 About 页面文字换行；
+* 保持 MIUI 14 / Android 13、`arm64-v8a` 与 libxposed API 101/102 兼容。
+
+### APK
+
+* 文件：`CustoMIUIzer-A13-r13.8.6.apk`
+* 大小：`2836582 bytes`
+* SHA-256：`ABF31CE311253AE863F7B2CEB87BF95140EE706EFF39ADA219033552B6FA7287`
+* 签名证书 SHA-256：`C0EFF2DC4E662717195490DA78B12A984C6F2E6BD38ACF4EDAD14D53E3D22E70`
+* versionCode / versionName：`131 / r13.8.6`
+
+### 验证说明
+
+本版本已完成 APK 构建、签名、zipalign、包信息和 Xposed 元数据基础检查；未执行完整测试套件和全功能实机回归。
+
 ## r13.7.0
 
 ### 稳定性
