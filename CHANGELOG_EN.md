@@ -1,18 +1,17 @@
 # Changelog
 
-## r13.9.1 (2026-08-01)
+## r13.9.2 (2026-08-01)
 
-- Improved Hook target capability checks and failure diagnostics for MIUI 14 / Android 13 and HyperOS 1 / Android 13;
-- Fixed ResourceHooks argument handling and status-bar clock installation diagnostics;
-- Hardened lifecycle ownership for receivers, preferences, step counter, device monitor, audio visualization, lock-screen album art, and delayed input;
-- Reduced reflection and temporary objects in status-bar, notification, Launcher, and resource-replacement hot paths;
-- Shortened settings transitions and made Preference/switch clicks show feedback sooner;
-- Isolated ordinary feature failures while preserving `OutOfMemoryError` propagation.
+- Releases the lock-screen album-art background, one-frame cache, and static processed result after the owner View detaches, reducing large-Bitmap residency in SystemUI;
+- Restores 350ms settings transitions to correct the overly fast navigation pace;
+- Gives switches immediate press feedback without creating an alpha animator for every tap;
+- Uses a dedicated concise module summary instead of expanding the complete README in listings;
+- Changes no MIUI 14 / Android 13 or HyperOS 1 / Android 13 ROM Hook target or fallback.
 
-The formal APK is `CustoMIUIzer-A13-r13.9.1.apk`, with SHA-256 `98F03BFB1FA29E776C3A638E771CCE6D1672F5C94F91B39B7D7D4362DB6EF96C` and A13 signing certificate SHA-256 `15CE32F03E4D8E62DF9390F77431862E59BF2CF95CD5A72F0C7330CDFCCA2934`.
+APK SHA-256: `0542E87E5FED06A1BBEC5509C7F5412555D8677850BE939032CD15A2F439BD80`
 
-> r13.8.6 used a different historical certificate. Back up settings and uninstall the old release before installing r13.9.1.
+Signing certificate SHA-256: `15CE32F03E4D8E62DF9390F77431862E59BF2CF95CD5A72F0C7330CDFCCA2934`
 
 ## Historical implementation summary
 
-The A13 release line established an independent package and libxposed API 101/102 migration, System/SystemUI/Launcher domain separation, small Kotlin migrations, hardened preferences and resource Hooks, receiver/observer/handler lifecycle ownership, bounded caches and cancellable asynchronous work, explicit OOM boundaries, Contract/Resolver compatibility diagnostics, and continuing performance work across status bar, lock screen, notifications, Launcher, and settings UI. Detailed history remains available through source-repository Git tags and commits.
+The A13 line established an independent package and A13 signing identity, libxposed API 101/102, System/SystemUI/Launcher separation, Kotlin migrations, hardened resource and preference Hooks, lifecycle ownership, bounded caches, explicit OOM boundaries, and Contract/Resolver compatibility diagnostics. Source-repository Git tags and commits retain the detailed history.
