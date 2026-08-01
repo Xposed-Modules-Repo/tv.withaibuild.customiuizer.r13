@@ -1,56 +1,18 @@
 # 更新日志
 
-> 说明：Releases 页面仅保留当前正式版。旧版本完整变更记录继续保留在本文件；旧版 APK 不再提供下载，历史源码 tag 仍保留。
+## r13.9.1（2026-08-01）
 
-## r13.8.6
+- 增强 MIUI 14 / Android 13 与 HyperOS 1 / Android 13 的 Hook 目标能力探测和失败诊断；
+- 修复 ResourceHooks 参数处理与状态栏时钟安装诊断；
+- 加固 Receiver、偏好、计步器、设备监控、音频可视化、锁屏专辑图和延迟输入的生命周期；
+- 减少状态栏、通知、桌面与资源替换高频路径的反射和临时对象；
+- 缩短设置页面动画，使 Preference 和开关点击更快显示反馈；
+- 普通功能异常安全隔离，`OutOfMemoryError` 不被吞掉。
 
-* 合并 A13 最新维护、兼容诊断、作用域和 UI 改进；
-* 完善 Hook 目标解析、安装结果记录和兼容回退；
-* 加强 Receiver、Observer、计步器、设备监控和锁屏专辑图生命周期；
-* 优化状态栏、通知、网速、电池、时钟和 Launcher 高频路径；
-* 状态栏网速保留系统字体，并支持双排网速行距调整；
-* 修复设置文本样式继承和 About 页面文字换行；
-* 保持 MIUI 14 / Android 13、`arm64-v8a` 与 libxposed API 101/102 兼容。
+正式 APK 为 `CustoMIUIzer-A13-r13.9.1.apk`，SHA-256 为 `98F03BFB1FA29E776C3A638E771CCE6D1672F5C94F91B39B7D7D4362DB6EF96C`，A13 签名证书 SHA-256 为 `15CE32F03E4D8E62DF9390F77431862E59BF2CF95CD5A72F0C7330CDFCCA2934`。
 
-### APK
+> r13.8.6 使用了不同的历史证书，升级前必须备份设置并卸载旧版。
 
-* 文件：`CustoMIUIzer-A13-r13.8.6.apk`
-* 大小：`2836582 bytes`
-* SHA-256：`ABF31CE311253AE863F7B2CEB87BF95140EE706EFF39ADA219033552B6FA7287`
-* 签名证书 SHA-256：`C0EFF2DC4E662717195490DA78B12A984C6F2E6BD38ACF4EDAD14D53E3D22E70`
-* versionCode / versionName：`131 / r13.8.6`
+## 历代核心实现总结
 
-### 验证说明
-
-本版本已完成 APK 构建、签名、zipalign、包信息和 Xposed 元数据基础检查；未执行完整测试套件和全功能实机回归。
-
-## r13.7.0
-
-### 稳定性
-
-- 为 Hook 注册的 Receiver、Observer、Listener、Handler 与 Runnable 增加模块异常边界。
-- 使用稳定 owner 和注册 key 管理回调替换、注销和宿主销毁。
-- 修复 RemotePreferences 初始化、监听注册与镜像恢复问题。
-- 修复弱引用清理、Hook 实例附加字段和 Launcher 循环退出语义。
-
-### 性能与生命周期
-
-- 避免只读 Hook 参数时复制参数数组。
-- 设备监控在熄屏时暂停，并使用有界退避。
-- 应用图标加载增加有界队列、请求去重、弱 View 等待者和字节 LRU。
-- 设置搜索、AudioVisualizer 和锁屏专辑图采用 latest-wins、generation 与明确取消边界。
-
-### 兼容与验证
-
-- 仅支持 MIUI 14 / Android 13，ABI 为 `arm64-v8a`。
-- applicationId 保持 `tv.withaibuild.customiuizer.r13`。
-- libxposed 保持 API 101–102，`staticScope=false`。
-- LSPosed 2.1.1（7790）日志未发现模块因果 crash、ANR、Fatal、Hook/反射失败或异常刷屏。
-- 678 个单元测试、三档 Lint、R8、资源压缩、zipalign 和 v2 签名门禁通过。
-
-### 下载校验
-
-- APK：`CustoMIUIzer-A13-r13.7.0.apk`
-- 大小：`2,781,130` bytes（`2.652 MiB`）
-- SHA-256：`0A7A07C6A6639DA8890912D6EE145FAB5123F6288D1F98F121AFB1572F75C8A8`
-- 证书 SHA-256：`C0EFF2DC4E662717195490DA78B12A984C6F2E6BD38ACF4EDAD14D53E3D22E70`
+历代 A13 版本完成了独立包名和 libxposed API 101/102 迁移、System/SystemUI/Launcher 拆分、小批量 Kotlin 化、偏好与资源 Hook 加固、Receiver/Observer/Handler 生命周期治理、有界缓存和异步任务取消、OOM 边界、Contract/Resolver 兼容诊断，以及状态栏、锁屏、通知、桌面和设置界面的持续性能优化。详细历史保留在源码仓库的 Git tag 和提交记录中。

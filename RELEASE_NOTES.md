@@ -1,28 +1,25 @@
-# r13.7.0 正式版 / Formal Release
+# CustoMIUIzer A13 r13.9.1
 
-米客 A13 面向 MIUI 14 / Android 13 的正式稳定版本。
+适用于 MIUI 14 / Android 13 与 HyperOS 1 / Android 13。
 
-本版本完成 System、SystemUI、Launcher 工程拆分与迁移审计，补齐异步回调异常隔离和生命周期所有权，并优化设备监控、应用图标、设置搜索、AudioVisualizer 与锁屏专辑图的队列和缓存边界。
+- 改进 Hook 目标探测、ResourceHooks 和状态栏时钟诊断；
+- 加固 OOM、Receiver、异步任务和 View 生命周期边界；
+- 降低状态栏、通知、Launcher 与资源 Hook 热路径开销；
+- 优化设置页动画、Preference 点击和开关即时反馈。
 
-LSPosed 2.1.1（7790）实机日志未发现模块因果 crash、ANR、Fatal、Hook/反射失败或异常刷屏。发布门禁覆盖 678 个单元测试、invariants、迁移审计、三档 Lint、Debug/Release、R8、资源压缩、zipalign 和 v2 签名。
+下载校验：
 
-> 适用范围仅为 MIUI 14 / Android 13。不同 ROM 仍可能需要单项兼容；日志与静态门禁不能证明所有功能在所有系统变体上的视觉和行为完全一致。
+- `CustoMIUIzer-A13-r13.9.1.apk`
+- `2,860,194 bytes`
+- APK SHA-256：`98F03BFB1FA29E776C3A638E771CCE6D1672F5C94F91B39B7D7D4362DB6EF96C`
+- 签名证书 SHA-256：`15CE32F03E4D8E62DF9390F77431862E59BF2CF95CD5A72F0C7330CDFCCA2934`
 
-## 下载校验
+重要：r13.8.6 使用了不同的历史证书，不能直接覆盖安装。请先备份设置、卸载旧版，再安装 r13.9.1。
 
-- `CustoMIUIzer-A13-r13.7.0.apk`
-- `2,781,130` bytes（`2.652 MiB`）
-- SHA-256：`0A7A07C6A6639DA8890912D6EE145FAB5123F6288D1F98F121AFB1572F75C8A8`
-- 证书 SHA-256：`C0EFF2DC4E662717195490DA78B12A984C6F2E6BD38ACF4EDAD14D53E3D22E70`
-
-证书 DN 的历史名称为 `CN=CustoMIUIzer A14`；本次未更换签名者，以保持已测试 A13 构建的升级兼容。该名称不表示支持 Android 14。
+MIUI 14 保留既有实机稳定基线；本版本新增改动及 HyperOS 1 / Android 13 仍待新的 LSPosed 详细日志验证。
 
 ---
 
-CustoMIUIzer A13 formal stable release for MIUI 14 / Android 13.
+For MIUI 14 / Android 13 and HyperOS 1 / Android 13. This release improves Hook target diagnostics, ResourceHooks, OOM and lifecycle boundaries, hot-path performance, settings transitions, and immediate Preference/switch feedback.
 
-This release completes the System, SystemUI, and Launcher engineering split and migration audit, adds deferred-callback isolation and lifecycle ownership, and bounds queues and caches for device monitoring, application icons, settings search, AudioVisualizer, and lock-screen album art.
-
-The LSPosed 2.1.1 (7790) device evidence contains no module-causal crash, ANR, Fatal, Hook/reflection failure, or repeated exception. Release gates cover 678 unit tests, runtime invariants, migration audit, all three Lint variants, Debug/Release, R8, resource shrinking, zip alignment, and v2 signing.
-
-> This release supports MIUI 14 / Android 13 only. Individual features may still require ROM-specific compatibility work; logs and static gates cannot prove every visual and behavioral permutation on every system build.
+Important: r13.8.6 used a different historical certificate and cannot be upgraded in place. Back up settings, uninstall the old release, and then install r13.9.1. New release changes and HyperOS 1 targets still require detailed on-device LSPosed-log validation.

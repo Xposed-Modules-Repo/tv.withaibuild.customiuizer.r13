@@ -1,64 +1,46 @@
-# 米客 A13 Kotlin 重构｜MIUI 14 / Android 13｜支持 API 101/102
+# CustoMIUIzer A13（米客 A13）
 
 简体中文 | [English](README_EN.md)
 
-面向 **MIUI 14 / Android 13** 的系统界面与交互定制模块。
+适用于 Android 13 的 MIUI / HyperOS 系统界面与交互定制模块。
 
 ## 当前正式版
 
-| 项目           | 值                                 |
-| ------------ | --------------------------------- |
-| 版本           | `r13.8.6`                         |
-| versionCode  | `131`                             |
-| 系统           | MIUI 14 / Android 13              |
-| ABI          | `arm64-v8a`                       |
-| 应用 ID        | `tv.withaibuild.customiuizer.r13` |
-| libxposed    | API 101–102                       |
-| APK          | `CustoMIUIzer-A13-r13.8.6.apk`    |
-| 大小           | `2836582 bytes`        |
-| APK SHA-256  | `ABF31CE311253AE863F7B2CEB87BF95140EE706EFF39ADA219033552B6FA7287`                  |
-| 签名证书 SHA-256 | `C0EFF2DC4E662717195490DA78B12A984C6F2E6BD38ACF4EDAD14D53E3D22E70`                 |
+- 版本：`r13.9.1`（versionCode `132`）
+- APK：`CustoMIUIzer-A13-r13.9.1.apk`
+- 大小：`2,860,194 bytes`
+- SHA-256：`98F03BFB1FA29E776C3A638E771CCE6D1672F5C94F91B39B7D7D4362DB6EF96C`
+- 签名证书 SHA-256：`15CE32F03E4D8E62DF9390F77431862E59BF2CF95CD5A72F0C7330CDFCCA2934`
 
-> Releases 页面仅保留当前正式版。旧版本的变更记录已合并到当前 Release 和 CHANGELOG；旧版 APK 不再提供下载，历史源码 tag 继续保留。
+## 兼容范围与要求
 
-## r13.8.6 更新重点
+- MIUI 14 / Android 13；
+- HyperOS 1 / Android 13；
+- `arm64-v8a`；
+- 已 Root，并安装支持 libxposed API 101 或 102 的 LSPosed / Vector；
+- 不支持 Android 14 及以上版本。
 
-* 合并 A13 最新维护、兼容诊断、作用域和 UI 改进；
-* 完善 Hook 目标解析、安装结果记录和兼容回退；
-* 加强 Receiver、Observer、计步器、设备监控和锁屏专辑图生命周期；
-* 优化状态栏、通知、网速、电池、时钟和桌面高频路径；
-* 状态栏网速保留系统字体，并支持双排行距调整；
-* 修复设置文本样式和 About 页面换行。
+已知实机基线为 Redmi Note 11T Pro（`xaga`）、MIUI `V14.0.10.0.TLOINXM`、LSPosed 2.1.1。HyperOS 1 / Android 13 是正式兼容目标，但不同 ROM 的 SystemUI、Launcher 和 system_server 结构可能不同，具体功能仍需按 ROM 日志确认。
 
-## 适用范围
+## 主要功能
 
-* MIUI 14 / Android 13（API 33）；
-* `arm64-v8a`；
-* 实现 libxposed API 101 或 API 102 的 LSPosed / Vector；
-* 不支持 Android 14 及更高版本。
-
-不同 ROM 的 SystemUI、Launcher 和系统应用实现可能不同，部分功能可能需要单独适配。
+- 状态栏时钟、日期、温度、网速、电池、信号和图标布局；
+- 控制中心、通知、音量、亮度、锁屏、媒体与充电信息；
+- 桌面图标、文件夹、Dock、最近任务、手势和动画；
+- 导航键、按键动作、电源菜单、浮窗、安装器、分享和应用权限。
 
 ## 安装
 
-1. 从本仓库 Release 下载 APK；
-2. 核对 APK SHA-256；
-3. 安装并在 LSPosed / Vector 中启用模块；
-4. 确认建议作用域；
-5. 打开一次模块设置并完整重启设备。
+1. 从本仓库最新 Release 下载 APK，并核对 SHA-256；
+2. 备份现有模块设置；
+3. 如果已安装 r13.8.6，请先卸载旧版；该版本使用了不同证书，不能直接覆盖安装；
+4. 安装 r13.9.1，在 LSPosed / Vector 中启用模块并确认建议作用域；
+5. 打开一次模块设置，然后完整重启设备。
 
-使用不同签名的早期构建不能直接覆盖安装。遇到签名不一致时，请先备份设置，再卸载旧版。
+## 风险提示
 
-## 验证状态
+这是修改系统进程和系统界面的 Xposed 模块。ROM 更新、系统应用更新或不匹配的作用域可能导致单项功能失效、SystemUI 重启或 Launcher 异常。首次安装后请分批启用功能；遇到问题时先关闭相关功能，并提交设备、ROM、框架版本、作用域、复现步骤和完整 LSPosed 日志。
 
-本版本已完成 Release APK 构建、签名、zipalign、包信息和 Xposed 元数据基础检查。
+静态测试和 APK 校验不能替代所有 ROM 的实机回归。本版本新增改动及 HyperOS 1 / Android 13 仍待更多实机日志验证。
 
-本次发布未执行完整单元测试、Lint、工程 Audit 或全部功能实机回归。
-
-## 源码与反馈
-
-源码、完整 changelog 和工程说明：
-
-`https://github.com/tomthenpc/customiuizer-a13`
-
-提交问题时请附模块版本、设备、ROM、框架版本、实际作用域、复现步骤和完整日志。
+源码：<https://github.com/tomthenpc/customiuizer-a13>

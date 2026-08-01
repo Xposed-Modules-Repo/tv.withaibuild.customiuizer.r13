@@ -1,64 +1,46 @@
-# CustoMIUIzer A13 Kotlin Refactor｜MIUI 14 / Android 13｜API 101/102
+# CustoMIUIzer A13
 
 [简体中文](README.md) | English
 
-A system UI and interaction customization module for **MIUI 14 / Android 13**.
+An Android 13 system UI and interaction customization module for MIUI and HyperOS.
 
 ## Current release
 
-| Item | Value |
-|---|---|
-| Version | `r13.8.6` |
-| versionCode | `131` |
-| System | MIUI 14 / Android 13 |
-| ABI | `arm64-v8a` |
-| Application ID | `tv.withaibuild.customiuizer.r13` |
-| libxposed | API 101–102 |
-| APK | `CustoMIUIzer-A13-r13.8.6.apk` |
-| Size | `2836582 bytes` |
-| APK SHA-256 | `ABF31CE311253AE863F7B2CEB87BF95140EE706EFF39ADA219033552B6FA7287` |
-| Signing certificate SHA-256 | `C0EFF2DC4E662717195490DA78B12A984C6F2E6BD38ACF4EDAD14D53E3D22E70` |
+- Version: `r13.9.1` (versionCode `132`)
+- APK: `CustoMIUIzer-A13-r13.9.1.apk`
+- Size: `2,860,194 bytes`
+- SHA-256: `98F03BFB1FA29E776C3A638E771CCE6D1672F5C94F91B39B7D7D4362DB6EF96C`
+- Signing certificate SHA-256: `15CE32F03E4D8E62DF9390F77431862E59BF2CF95CD5A72F0C7330CDFCCA2934`
 
-> This Releases page only keeps the current formal release. Changelog for older versions has been merged into the current Release and CHANGELOG. Older APKs are no longer available for download; the historical source tags remain.
+## Compatibility and requirements
 
-## r13.8.6 highlights
+- MIUI 14 / Android 13;
+- HyperOS 1 / Android 13;
+- `arm64-v8a`;
+- Root access and LSPosed / Vector supporting libxposed API 101 or 102;
+- Android 14 and later are not supported.
 
-* Merged the latest A13 maintenance, compatibility diagnostics, scope and UI improvements;
-* Improved hook target resolution, install result recording and compatibility fallback;
-* Strengthened lifecycles for receivers, observers, step counter, device monitor and lock-screen album art;
-* Optimized hot paths in status bar, notifications, network speed, battery, clock and launcher;
-* Preserved the system typeface for status-bar network speed and added dual-row line spacing adjustment;
-* Fixed settings text style and About page wrapping.
+The known device baseline is Redmi Note 11T Pro (`xaga`), MIUI `V14.0.10.0.TLOINXM`, and LSPosed 2.1.1. HyperOS 1 / Android 13 is a formal compatibility target, but SystemUI, Launcher, and system_server internals vary between ROMs, so individual features still require ROM-specific log confirmation.
 
-## Scope
+## Main features
 
-* MIUI 14 / Android 13 (API 33);
-* `arm64-v8a`;
-* LSPosed / Vector implementing libxposed API 101 or 102;
-* Android 14 and later are not supported.
-
-Different ROM implementations of SystemUI, Launcher and system apps may vary; some features may need ROM-specific adaptation.
+- Status-bar clock, date, temperature, network speed, battery, signal, and icon layout;
+- Control center, notifications, volume, brightness, lock screen, media, and charging information;
+- Launcher icons, folders, Dock, recents, gestures, and animations;
+- Navigation keys, button actions, power menu, floating windows, installer, sharing, and app permissions.
 
 ## Installation
 
-1. Download the APK from this repository's Release;
-2. Verify the APK SHA-256;
-3. Install and enable the module in LSPosed / Vector;
-4. Confirm the recommended scope;
-5. Open module settings once and fully reboot.
+1. Download the APK from the latest Release and verify its SHA-256;
+2. Back up your current module settings;
+3. If r13.8.6 is installed, uninstall it first. That release used a different certificate and cannot be upgraded in place;
+4. Install r13.9.1, enable it in LSPosed / Vector, and confirm the recommended scope;
+5. Open module settings once, then fully reboot the device.
 
-Early builds signed with a different certificate cannot be upgraded in place. If a signature mismatch appears, back up your settings and uninstall the old build first.
+## Risk notice
 
-## Verification status
+This Xposed module modifies system processes and system UI. ROM updates, system-app updates, or a mismatched scope can disable individual features or restart SystemUI/Launcher. Enable features in small batches after first installation. If a problem occurs, disable the related feature and provide the device, ROM, framework version, scope, reproduction steps, and complete LSPosed logs.
 
-This release completed Release APK build, signing, zipalign, package info and Xposed metadata basic checks.
+Static tests and APK checks cannot replace on-device regression across every ROM. New changes in this release and HyperOS 1 / Android 13 still require broader device-log validation.
 
-Full unit tests, Lint, engineering audit or complete functional regression on a real device were not run for this release.
-
-## Source code and feedback
-
-Source code, full changelog and engineering notes:
-
-`https://github.com/tomthenpc/customiuizer-a13`
-
-When submitting an issue, include module version, device, ROM, framework version, actual scope, reproduction steps and complete logs.
+Source: <https://github.com/tomthenpc/customiuizer-a13>
