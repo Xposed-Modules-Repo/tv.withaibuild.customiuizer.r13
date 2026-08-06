@@ -12,19 +12,19 @@ CustoMIUIzer A13 是面向 MIUI 14 / Android 13 的系统界面与交互定制�
 | versionCode | `135` |
 | 应用 ID | `tv.withaibuild.customiuizer.r13` |
 | 架构 | `arm64-v8a` |
-| 实装框架 | [Vector v2.2](https://github.com/JingMatrix/Vector/releases/tag/v2.2) |
+| 实装框架 | LSPosed / Vector |
 | 源码 | <https://github.com/tomthenpc/customiuizer-a13> |
 
 ## 兼容范围与要求
 
 - MIUI 14 / Android 13 为主要兼容目标；
 - HyperOS 1 / Android 13 通过 ROM Contract 与目标能力探测选择兼容路径，具体功能取决于 ROM 与系统应用版本；
-- 设备需要 Root，并安装 [Vector v2.2](https://github.com/JingMatrix/Vector/releases/tag/v2.2)；
+- 设备需要 Root，并安装 LSPosed / Vector 框架；
 - 模块元数据：`minApiVersion=101`、`targetApiVersion=102`、`staticScope=false`；
 - 不支持 Android 14 及以上版本；
 - 请勿与上游版或其他 CustoMIUIzer 派生模块同时启用。
 
-已知实装基线：Redmi Note 11T Pro（`xaga`）、MIUI `V14.0.10.0.TLOINXM`、Vector v2.2。
+已知实装基线：Redmi Note 11T Pro（`xaga`）、MIUI `V14.0.10.0.TLOINXM`。
 
 ## 主要功能
 
@@ -37,13 +37,13 @@ CustoMIUIzer A13 是面向 MIUI 14 / Android 13 的系统界面与交互定制�
 
 ## 安装
 
-1. 安装 [Vector v2.2](https://github.com/JingMatrix/Vector/releases/tag/v2.2)；
+1. 安装 LSPosed / Vector 框架；
 2. 从本仓库最新 Release 下载并安装 APK；
-3. 在 Vector 中启用模块并确认建议作用域；
+3. 在 LSPosed / Vector 框架中启用模块并确认建议作用域；
 4. 打开一次模块设置，然后完整重启设备。
 
 ## 问题反馈
 
-功能兼容性取决于 ROM 与系统应用版本。异常时请先关闭对应功能，并提供设备、ROM、Vector 版本、作用域、复现步骤与相关日志。
+功能兼容性取决于 ROM 与系统应用版本。异常时请先关闭对应功能，并提供设备、ROM、框架版本、作用域、复现步骤与相关日志。
 
 源码与问题反馈：<https://github.com/tomthenpc/customiuizer-a13>

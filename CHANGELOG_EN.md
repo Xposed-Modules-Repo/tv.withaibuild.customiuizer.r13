@@ -14,7 +14,7 @@
 - Reworked DeviceInfo around fixed buffers and byte-wise sysfs parsing, reducing periodic I/O, Binder queries, and temporary objects;
 - Added Release compilation, tests, Lint, R8, dependency-integrity, Manifest, and Xposed metadata gates, while removing unused dependencies and invalid metadata.
 
-Known deployed baseline: Redmi Note 11T Pro (`xaga`), MIUI `V14.0.10.0.TLOINXM`, and Vector v2.2. HyperOS 1 feature availability depends on the ROM and system-app versions.
+Known deployed baseline: Redmi Note 11T Pro (`xaga`), MIUI `V14.0.10.0.TLOINXM`, . HyperOS 1 feature availability depends on the ROM and system-app versions.
 
 ## r13.9.2 — 2026-08-01
 

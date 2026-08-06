@@ -14,7 +14,7 @@
 - DeviceInfo 改用固定缓冲区和逐字节 sysfs 解析，减少周期性 I/O、Binder 查询和临时对象；
 - 增加 Release 编译、测试、Lint、R8、依赖完整性、Manifest 与 Xposed 元数据门禁，并清理未引用依赖和异常元数据。
 
-已知实装基线：Redmi Note 11T Pro（`xaga`）、MIUI `V14.0.10.0.TLOINXM`、Vector v2.2。HyperOS 1 的具体功能可用性取决于 ROM 与系统应用版本。
+已知实装基线：Redmi Note 11T Pro（`xaga`）、MIUI `V14.0.10.0.TLOINXM`。HyperOS 1 的具体功能可用性取决于 ROM 与系统应用版本。
 
 ## r13.9.2 — 2026-08-01
 
