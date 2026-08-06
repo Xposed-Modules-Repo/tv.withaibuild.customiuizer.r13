@@ -1,43 +1,49 @@
-# CustoMIUIzer A13
+# CustoMIUIzer A13 | MIUI 14 / Android 13
 
 [简体中文](README.md) | English
 
-An Android 13 system UI and interaction customization module for MIUI and HyperOS.
+CustoMIUIzer A13 is a system UI and interaction customization module for MIUI 14 / Android 13, with capability-based compatibility paths for HyperOS 1 / Android 13.
 
-## Current release
+## Current Version
 
-- `r13.9.2` (versionCode `133`)
-- APK: `CustoMIUIzer-A13-r13.9.2.apk` (`2,859,894 bytes`)
-- SHA-256: `0542E87E5FED06A1BBEC5509C7F5412555D8677850BE939032CD15A2F439BD80`
-- Signing certificate SHA-256: `15CE32F03E4D8E62DF9390F77431862E59BF2CF95CD5A72F0C7330CDFCCA2934`
+| Item | Value |
+| --- | --- |
+| Version | `r13.10.1` |
+| versionCode | `135` |
+| Application ID | `tv.withaibuild.customiuizer.r13` |
+| ABI | `arm64-v8a` |
+| Deployed framework | [Vector v2.2](https://github.com/JingMatrix/Vector/releases/tag/v2.2) |
+| Source | <https://github.com/tomthenpc/customiuizer-a13> |
 
-## Compatibility and requirements
+## Compatibility and Requirements
 
-- MIUI 14 / Android 13;
-- HyperOS 1 / Android 13;
-- `arm64-v8a`;
-- Root access and LSPosed / Vector supporting libxposed API 101 or 102;
-- Android 14 and later are not supported.
+- MIUI 14 / Android 13 is the primary compatibility target;
+- HyperOS 1 / Android 13 selects compatibility paths through ROM Contracts and target capability detection; feature availability depends on the ROM and system-app versions;
+- The device must be rooted and run [Vector v2.2](https://github.com/JingMatrix/Vector/releases/tag/v2.2);
+- Module metadata: `minApiVersion=101`, `targetApiVersion=102`, `staticScope=false`;
+- Android 14 and later are not supported;
+- Do not enable this module together with upstream or another CustoMIUIzer-derived module.
 
-Known baseline: Redmi Note 11T Pro (`xaga`), MIUI `V14.0.10.0.TLOINXM`, and LSPosed 2.1.1. HyperOS 1 internals can differ from MIUI 14, so individual features still require ROM-specific log confirmation.
+Known deployed baseline: Redmi Note 11T Pro (`xaga`), MIUI `V14.0.10.0.TLOINXM`, and Vector v2.2.
 
-## Main features
+## Main Features
 
 - Status-bar clock, date, temperature, network speed, battery, signal, and icon layout;
-- Control center, notifications, volume, brightness, lock screen, media, and charging information;
+- Control center, notifications, volume, brightness, lock screen, media, and charging UI;
 - Launcher icons, folders, Dock, recents, gestures, and animations;
-- Navigation keys, button actions, power menu, floating windows, installer, sharing, and app permissions.
+- Navigation keys, button actions, power menu, floating windows, multi-window behavior, installer, sharing, and app permissions.
+
+`r13.10.1` focuses on process-routed installation, ROM compatibility detection, preference and lifecycle state, error boundaries, user-behavior callbacks, and lower-overhead DeviceInfo and Launcher hot paths. See [CHANGELOG_EN.md](CHANGELOG_EN.md) for details.
 
 ## Installation
 
-1. Download the APK from the latest Release and verify its SHA-256;
-2. Back up current module settings;
-3. If r13.8.6 is installed, uninstall it first because that release used a different certificate;
-4. Install r13.9.2, enable it in LSPosed / Vector, and confirm the recommended scope;
-5. Open module settings once, then fully reboot the device.
+1. Install [Vector v2.2](https://github.com/JingMatrix/Vector/releases/tag/v2.2);
+2. Download and install the APK from the latest Release in this repository;
+3. Enable the module in Vector and confirm the recommended scope;
+4. Open module settings once, then fully reboot the device.
 
-## Risk notice
+## Issue Reporting
 
-This module modifies system processes and system UI. ROM/system-app updates or an incorrect scope can disable features or restart SystemUI/Launcher. Enable features in small batches. If a problem occurs, disable the related feature and provide the device, ROM, framework version, scope, reproduction steps, and complete LSPosed logs. Static tests cannot replace on-device regression across every ROM.
+Feature compatibility depends on the ROM and system-app versions. If a problem occurs, disable the related feature first and provide the device, ROM, Vector version, scope, reproduction steps, and relevant logs.
 
-Source: <https://github.com/tomthenpc/customiuizer-a13>
+Source and issue reporting: <https://github.com/tomthenpc/customiuizer-a13>

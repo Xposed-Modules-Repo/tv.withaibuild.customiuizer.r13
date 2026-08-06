@@ -1,17 +1,28 @@
 # Changelog
 
-## r13.9.2 (2026-08-01)
+[简体中文](CHANGELOG.md) | English
 
-- Releases the lock-screen album-art background, one-frame cache, and static processed result after the owner View detaches, reducing large-Bitmap residency in SystemUI;
-- Restores 350ms settings transitions to correct the overly fast navigation pace;
-- Gives switches immediate press feedback without creating an alpha animator for every tap;
-- Uses a dedicated concise module summary instead of expanding the complete README in listings;
-- Changes no MIUI 14 / Android 13 or HyperOS 1 / Android 13 ROM Hook target or fallback.
+## r13.10.1 — 2026-08-06
 
-APK SHA-256: `0542E87E5FED06A1BBEC5509C7F5412555D8677850BE939032CD15A2F439BD80`
+- Split SystemUI, Launcher, `system_server`, and regular-app installation into process-specific entry points, using stable feature identities and install state to reduce unrelated loading and duplicate installation;
+- Hardened early preference snapshots, concurrent loading, empty-snapshot handling, and failed state so preference updates do not duplicate Hooks or incorrectly roll back state;
+- Improved MIUI 14 and HyperOS 1 / Android 13 ROM Contracts, target resolution, and variant selection, skipping only the affected feature when a target is missing;
+- Ordinary ROM, reflection, and callback failures remain isolated, while `OutOfMemoryError`, `ThreadDeath`, and `VirtualMachineError` continue to propagate;
+- Completed replacement, stale-state, and release paths for Receivers, Observers, Views, Handlers, and controllers, and removed blocking waits from selector UI paths;
+- Hardened callback paths for call-interruption control, secure-window removal, temporary overlay hiding during screenshots, notification/share floating-window actions, and multi-window restrictions;
+- Optimized Launcher animation scaling, HotSeats gesture state, and FSG Class resolution to reduce repeated reflection, configuration reads, and touch-event overhead;
+- Reworked DeviceInfo around fixed buffers and byte-wise sysfs parsing, reducing periodic I/O, Binder queries, and temporary objects;
+- Added Release compilation, tests, Lint, R8, dependency-integrity, Manifest, and Xposed metadata gates, while removing unused dependencies and invalid metadata.
 
-Signing certificate SHA-256: `15CE32F03E4D8E62DF9390F77431862E59BF2CF95CD5A72F0C7330CDFCCA2934`
+Known deployed baseline: Redmi Note 11T Pro (`xaga`), MIUI `V14.0.10.0.TLOINXM`, and Vector v2.2. HyperOS 1 feature availability depends on the ROM and system-app versions.
 
-## Historical implementation summary
+## r13.9.2 — 2026-08-01
 
-The A13 line established an independent package and A13 signing identity, libxposed API 101/102, System/SystemUI/Launcher separation, Kotlin migrations, hardened resource and preference Hooks, lifecycle ownership, bounded caches, explicit OOM boundaries, and Contract/Resolver compatibility diagnostics. Source-repository Git tags and commits retain the detailed history.
+- Released lock-screen album-art backgrounds, one-frame caches, and static processed results after the owner View detached;
+- Set settings-page transitions to `350ms`;
+- Gave switches immediate pressed-state feedback without per-tap alpha animators;
+- Added a dedicated concise module summary.
+
+## Historical Core Implementation Summary
+
+The A13 line established an independent package and Android 13 maintenance path; delivered libxposed API 101/102 compatibility; separated System, SystemUI, and Launcher domains; performed staged Kotlin migrations; hardened resource and preference Hooks; governed lifecycles; bounded caches; defined fatal-error boundaries; and introduced Contract/Resolver compatibility diagnostics. Detailed history remains in the source repository's Git commits and historical tags.
