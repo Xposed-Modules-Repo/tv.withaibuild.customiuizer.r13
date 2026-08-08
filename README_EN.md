@@ -24,7 +24,7 @@ CustoMIUIzer A13 is a system UI and interaction customization module for MIUI 14
 - Android 14 and later are not supported;
 - Do not enable this module together with upstream or another CustoMIUIzer-derived module.
 
-Known deployed baseline: Redmi Note 11T Pro (`xaga`), MIUI `V14.0.10.0.TLOINXM`, .
+Known deployed baseline: Redmi Note 11T Pro (`xaga`), MIUI `V14.0.10.0.TLOINXM`.
 
 ## Main Features
 
@@ -33,7 +33,7 @@ Known deployed baseline: Redmi Note 11T Pro (`xaga`), MIUI `V14.0.10.0.TLOINXM`,
 - Launcher icons, folders, Dock, recents, gestures, and animations;
 - Navigation keys, button actions, power menu, floating windows, multi-window behavior, installer, sharing, and app permissions.
 
-`r13.10.1` focuses on process-routed installation, ROM compatibility detection, preference and lifecycle state, error boundaries, user-behavior callbacks, and lower-overhead DeviceInfo and Launcher hot paths. See [CHANGELOG_EN.md](CHANGELOG_EN.md) for details.
+`r13.11.1` hardens the async lifecycle of settings and app selectors and optimizes the hot path for the status-bar clock default format; it also continues process-routed installation, ROM capability detection, and error-boundary governance. See [CHANGELOG_EN.md](CHANGELOG_EN.md) for details.
 
 ## Installation
 

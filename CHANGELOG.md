@@ -2,6 +2,16 @@
 
 简体中文 | [English](CHANGELOG_EN.md)
 
+## r13.11.1 — 2026-08-08
+
+- 加固 SubFragment 延迟滚动生命周期，在 View 销毁时取消待执行回调，避免过期 View 操作；
+- 加固 AppSelector 异步应用列表加载，以 application context、输入快照和 owner 清理降低 Activity / View 生命周期耦合；
+- 加固 ActivitySelector 异步加载，确保查询结果只在当前有效 View 生命周期内提交，并保持每次界面创建时重新查询的既有行为；
+- 优化状态栏时钟默认格式高频路径，缓存格式转换结果及稳定资源 ID，减少每次时间更新时的重复处理；
+- 保持系统原始时间格式、秒钟、12/24 小时制、AM/PM、前导零和自定义格式行为；
+- 完成 Android 13 正式 Release、Lint、R8、签名与设备核心加载验证；
+- HyperOS 1 / Android 13 的部分 SystemUI 定制仍取决于具体 ROM 内部类与系统应用版本。
+
 ## r13.10.1 — 2026-08-06
 
 - 按目标进程拆分 SystemUI、Launcher、`system_server` 与普通应用安装入口，并使用稳定 Feature 身份和安装状态减少无关加载与重复安装；

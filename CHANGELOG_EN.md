@@ -2,6 +2,16 @@
 
 [简体中文](CHANGELOG.md) | English
 
+## r13.11.1 — 2026-08-08
+
+- Hardened SubFragment delayed-scroll lifecycle, canceling pending callbacks when the View is destroyed to avoid stale View operations;
+- Hardened AppSelector async app-list loading with application context, input snapshots, and owner cleanup to reduce Activity / View lifecycle coupling;
+- Hardened ActivitySelector async loading so query results are only committed within the current valid View lifecycle, while preserving the existing behavior of re-querying on each UI creation;
+- Optimized the hot path for the status-bar clock default format, caching format conversion results and stable resource IDs to reduce repeated work on every time update;
+- Preserved the original system time format, seconds, 12/24-hour mode, AM/PM, leading zeros, and custom format behavior;
+- Completed Android 13 Release compilation, Lint, R8, signing, and core device-load verification;
+- Some HyperOS 1 / Android 13 SystemUI customizations still depend on specific ROM internal classes and system-app versions.
+
 ## r13.10.1 — 2026-08-06
 
 - Split SystemUI, Launcher, `system_server`, and regular-app installation into process-specific entry points, using stable feature identities and install state to reduce unrelated loading and duplicate installation;
