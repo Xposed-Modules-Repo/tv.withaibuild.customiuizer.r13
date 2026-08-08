@@ -8,8 +8,8 @@ CustoMIUIzer A13 是面向 MIUI 14 / Android 13 的系统界面与交互定制�
 
 | 项目 | 值 |
 | --- | --- |
-| 版本 | `r13.10.1` |
-| versionCode | `135` |
+| 版本 | `r13.11.1` |
+| versionCode | `137` |
 | 应用 ID | `tv.withaibuild.customiuizer.r13` |
 | 架构 | `arm64-v8a` |
 | 实装框架 | LSPosed / Vector |

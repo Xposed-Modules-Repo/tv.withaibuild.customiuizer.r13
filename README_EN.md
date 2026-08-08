@@ -8,8 +8,8 @@ CustoMIUIzer A13 is a system UI and interaction customization module for MIUI 14
 
 | Item | Value |
 | --- | --- |
-| Version | `r13.10.1` |
-| versionCode | `135` |
+| Version | `r13.11.1` |
+| versionCode | `137` |
 | Application ID | `tv.withaibuild.customiuizer.r13` |
 | ABI | `arm64-v8a` |
 | Deployed framework | LSPosed / Vector |
