@@ -8,8 +8,8 @@ CustoMIUIzer A13 是面向 MIUI 14 / Android 13 的系统界面与交互定制�
 
 | 项目 | 值 |
 | --- | --- |
-| 版本 | `r13.11.1` |
-| versionCode | `137` |
+| 版本 | `r13.12.0` |
+| versionCode | `138` |
 | 应用 ID | `tv.withaibuild.customiuizer.r13` |
 | 架构 | `arm64-v8a` |
 | 实装框架 | LSPosed / Vector |
@@ -33,7 +33,7 @@ CustoMIUIzer A13 是面向 MIUI 14 / Android 13 的系统界面与交互定制�
 - Launcher 图标、文件夹、Dock、最近任务、手势与动画；
 - 导航键、按键动作、电源菜单、浮窗、多窗口、安装器、分享与应用权限。
 
-`r13.11.1` 重点加固设置与应用选择器的异步生命周期，并优化状态栏时钟默认格式的高频刷新路径；同时延续按进程安装、ROM 兼容探测和异常边界治理。详细变化见 [CHANGELOG.md](CHANGELOG.md)。
+`r13.12.0` 修复自定义动作/桌面手势保存后回到“无动作”的问题，并补齐桌面手势页的“重启桌面”入口；同时纳入 USB 默认用途、安装器净化、文件夹模糊、备份 V2 与若干状态栏/桌面视觉增强。详细变化见 [CHANGELOG.md](CHANGELOG.md)。
 
 ## 安装
 

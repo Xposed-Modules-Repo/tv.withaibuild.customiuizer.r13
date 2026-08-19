@@ -2,6 +2,16 @@
 
 [简体中文](CHANGELOG.md) | English
 
+## r13.12.0 — 2026-08-19
+
+- Fixed custom/gesture actions snapping back to "No action";
+- Added Restart Launcher on the Launcher gesture page;
+- Added/improved USB default-mode mapping, installer purify, hide app-details report entry, dock height, hide IME dismiss button, folder blur toggle, settings backup V2, battery indicator custom colors, and screen-dim ratio correction;
+- Static gates, Release compile, Lint, R8, and signed APK inspection passed;
+- DEVICE_VERIFIED = NO; LOG_VERIFIED = NO.
+
+APK: `CustoMIUIzer-A13-r13.12.0.apk` / SHA-256 `643e93834c7028a4355f9915efbfe3aa49393ff18577331a76a485c6d9382e29`
+
 ## r13.11.1 — 2026-08-08
 
 - Hardened SubFragment delayed-scroll lifecycle, canceling pending callbacks when the View is destroyed to avoid stale View operations;

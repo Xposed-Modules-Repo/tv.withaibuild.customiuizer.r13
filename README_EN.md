@@ -8,8 +8,8 @@ CustoMIUIzer A13 is a system UI and interaction customization module for MIUI 14
 
 | Item | Value |
 | --- | --- |
-| Version | `r13.11.1` |
-| versionCode | `137` |
+| Version | `r13.12.0` |
+| versionCode | `138` |
 | Application ID | `tv.withaibuild.customiuizer.r13` |
 | ABI | `arm64-v8a` |
 | Deployed framework | LSPosed / Vector |
@@ -33,7 +33,7 @@ Known deployed baseline: Redmi Note 11T Pro (`xaga`), MIUI `V14.0.10.0.TLOINXM`.
 - Launcher icons, folders, Dock, recents, gestures, and animations;
 - Navigation keys, button actions, power menu, floating windows, multi-window behavior, installer, sharing, and app permissions.
 
-`r13.11.1` hardens the async lifecycle of settings and app selectors and optimizes the hot path for the status-bar clock default format; it also continues process-routed installation, ROM capability detection, and error-boundary governance. See [CHANGELOG_EN.md](CHANGELOG_EN.md) for details.
+`r13.12.0` fixes custom/gesture actions snapping back to "No action" and adds Restart Launcher on the gesture page; it also includes USB default-mode mapping, installer purify, folder blur, backup V2, and several status-bar/desktop visual improvements. See [CHANGELOG_EN.md](CHANGELOG_EN.md) for details.
 
 ## Installation
 
