@@ -2,6 +2,16 @@
 
 简体中文 | [English](CHANGELOG_EN.md)
 
+## r13.12.2 — 2026-08-19
+
+- 完成 r13.12.1 未完全覆盖的 Activity 选择结果两跳回传路径；
+- 修复 `MultiAction -> AppSelector -> ActivitySelector -> AppSelector -> MultiAction` 中回栈中继结果丢失；
+- 保留 r13.12.0 动作值规范化、Spinner 越界保护、动作契约与 Launcher 重启范围；
+- 静态门禁、Release 编译、Lint、R8 与签名 APK 检查已通过；
+- DEVICE_VERIFIED = NO；LOG_VERIFIED = NO。
+
+APK：`CustoMIUIzer-A13-r13.12.2.apk` / SHA-256 `d847b1608f465bd9996b444e824109c9d81cd92ebf946157489ba0795e529b4a`
+
 ## r13.12.1 — 2026-08-19
 
 - 修复 r13.12.0 引入的 MultiAction 选择器结果回传回归；

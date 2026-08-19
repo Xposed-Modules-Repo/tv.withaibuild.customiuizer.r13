@@ -2,6 +2,16 @@
 
 [简体中文](CHANGELOG.md) | English
 
+## r13.12.2 — 2026-08-19
+
+- Completes the Activity-selection relay path left incomplete in r13.12.1;
+- Fixes dropped return results in `MultiAction -> AppSelector -> ActivitySelector -> AppSelector -> MultiAction`;
+- Preserves r13.12.0 action normalization, spinner OOB protection, action/toggle contracts, and Launcher restart scope;
+- Static gates, Release compile, Lint, R8, and signed APK inspection passed;
+- DEVICE_VERIFIED = NO; LOG_VERIFIED = NO.
+
+APK: `CustoMIUIzer-A13-r13.12.2.apk` / SHA-256 `d847b1608f465bd9996b444e824109c9d81cd92ebf946157489ba0795e529b4a`
+
 ## r13.12.1 — 2026-08-19
 
 - Fixed the MultiAction selector-result regression introduced in r13.12.0;

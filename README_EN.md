@@ -8,8 +8,8 @@ CustoMIUIzer A13 is a system UI and interaction customization module for MIUI 14
 
 | Item | Value |
 | --- | --- |
-| Version | `r13.12.1` |
-| versionCode | `139` |
+| Version | `r13.12.2` |
+| versionCode | `140` |
 | Application ID | `tv.withaibuild.customiuizer.r13` |
 | ABI | `arm64-v8a` |
 | Deployed framework | LSPosed / Vector |
@@ -33,7 +33,7 @@ Known deployed baseline: Redmi Note 11T Pro (`xaga`), MIUI `V14.0.10.0.TLOINXM`.
 - Launcher icons, folders, Dock, recents, gestures, and animations;
 - Navigation keys, button actions, power menu, floating windows, multi-window behavior, installer, sharing, and app permissions.
 
-`r13.12.1` fixes the selector-result regression introduced in r13.12.0: app/shortcut/activity selections are no longer dropped when returning from child selectors. See [CHANGELOG_EN.md](CHANGELOG_EN.md) for details.
+`r13.12.2` completes the Activity-selection relay path left incomplete by r13.12.1, so `MultiAction -> AppSelector -> ActivitySelector -> AppSelector -> MultiAction` no longer drops the returned Activity choice. See [CHANGELOG_EN.md](CHANGELOG_EN.md) for details.
 
 ## Installation
 
