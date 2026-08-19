@@ -2,6 +2,16 @@
 
 [简体中文](CHANGELOG.md) | English
 
+## r13.12.1 — 2026-08-19
+
+- Fixed the MultiAction selector-result regression introduced in r13.12.0;
+- App/shortcut/activity selections are no longer dropped when returning from child selectors;
+- Preserves r13.12.0 action-value normalization, spinner OOB protection, action contract checks, and Launcher restart scope;
+- Static gates, Release compile, Lint, R8, and signed APK inspection passed;
+- DEVICE_VERIFIED = NO; LOG_VERIFIED = NO.
+
+APK: `CustoMIUIzer-A13-r13.12.1.apk` / SHA-256 `de5c9979098c6a0c00833e49a53f32a191c8ccb999fc37acf8f634d41d7b7fb1`
+
 ## r13.12.0 — 2026-08-19
 
 - Fixed custom/gesture actions snapping back to "No action";

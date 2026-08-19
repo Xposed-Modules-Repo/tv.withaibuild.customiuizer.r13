@@ -2,6 +2,16 @@
 
 简体中文 | [English](CHANGELOG_EN.md)
 
+## r13.12.1 — 2026-08-19
+
+- 修复 r13.12.0 引入的 MultiAction 选择器结果回传回归；
+- 返回上层后应用/快捷方式/Activity 选择不再丢失；
+- 保留 r13.12.0 的动作值规范化、Spinner 越界保护、动作契约与 Launcher 重启范围；
+- 静态门禁、Release 编译、Lint、R8 与签名 APK 检查已通过；
+- DEVICE_VERIFIED = NO；LOG_VERIFIED = NO。
+
+APK：`CustoMIUIzer-A13-r13.12.1.apk` / SHA-256 `de5c9979098c6a0c00833e49a53f32a191c8ccb999fc37acf8f634d41d7b7fb1`
+
 ## r13.12.0 — 2026-08-19
 
 - 修复自定义动作/桌面手势保存后可能回到“无动作”的问题；
