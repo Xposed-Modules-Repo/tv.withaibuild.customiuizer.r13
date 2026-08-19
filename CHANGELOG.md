@@ -4,33 +4,17 @@
 
 ## r13.12.2 — 2026-08-19
 
-- 完成 r13.12.1 未完全覆盖的 Activity 选择结果两跳回传路径；
-- 修复 `MultiAction -> AppSelector -> ActivitySelector -> AppSelector -> MultiAction` 中回栈中继结果丢失；
-- 保留 r13.12.0 动作值规范化、Spinner 越界保护、动作契约与 Launcher 重启范围；
+`versionCode 140`，r13.12 系列最终稳定版本，已包含并取代 `r13.12.0` / `r13.12.1`。
+
+- 修复自定义动作/桌面手势保存后可能回到“无动作”的问题；
+- 桌面手势页补齐“重启桌面”入口；
+- USB 默认用途在拔线后重新插上会再次应用；
+- 修复 `MultiAction -> AppSelector -> ActivitySelector -> AppSelector -> MultiAction` 两跳返回路径中回栈中继结果丢失；
+- 新增/改进：USB 默认用途映射、安装器净化、隐藏应用详情举报入口、Dock 高度、隐藏输入法关闭按钮、文件夹模糊开关、设置备份 V2、电池指示条自定义颜色、息屏变暗比例；
 - 静态门禁、Release 编译、Lint、R8 与签名 APK 检查已通过；
 - DEVICE_VERIFIED = NO；LOG_VERIFIED = NO。
 
 APK：`CustoMIUIzer-A13-r13.12.2.apk` / SHA-256 `d847b1608f465bd9996b444e824109c9d81cd92ebf946157489ba0795e529b4a`
-
-## r13.12.1 — 2026-08-19
-
-- 修复 r13.12.0 引入的 MultiAction 选择器结果回传回归；
-- 返回上层后应用/快捷方式/Activity 选择不再丢失；
-- 保留 r13.12.0 的动作值规范化、Spinner 越界保护、动作契约与 Launcher 重启范围；
-- 静态门禁、Release 编译、Lint、R8 与签名 APK 检查已通过；
-- DEVICE_VERIFIED = NO；LOG_VERIFIED = NO。
-
-APK：`CustoMIUIzer-A13-r13.12.1.apk` / SHA-256 `de5c9979098c6a0c00833e49a53f32a191c8ccb999fc37acf8f634d41d7b7fb1`
-
-## r13.12.0 — 2026-08-19
-
-- 修复自定义动作/桌面手势保存后可能回到“无动作”的问题；
-- 桌面手势页补齐“重启桌面”入口；
-- 新增/改进：USB 默认用途映射、安装器净化、隐藏应用详情举报入口、Dock 高度、隐藏输入法关闭按钮、文件夹模糊开关、设置备份 V2、电池指示条自定义颜色、息屏变暗比例修正；
-- 静态门禁、Release 编译、Lint、R8 与签名 APK 检查已通过；
-- DEVICE_VERIFIED = NO；LOG_VERIFIED = NO。
-
-APK：`CustoMIUIzer-A13-r13.12.0.apk` / SHA-256 `643e93834c7028a4355f9915efbfe3aa49393ff18577331a76a485c6d9382e29`
 
 ## r13.11.1 — 2026-08-08
 
@@ -55,13 +39,6 @@ APK：`CustoMIUIzer-A13-r13.12.0.apk` / SHA-256 `643e93834c7028a4355f9915efbfe3a
 - 增加 Release 编译、测试、Lint、R8、依赖完整性、Manifest 与 Xposed 元数据门禁，并清理未引用依赖和异常元数据。
 
 已知实装基线：Redmi Note 11T Pro（`xaga`）、MIUI `V14.0.10.0.TLOINXM`。HyperOS 1 的具体功能可用性取决于 ROM 与系统应用版本。
-
-## r13.9.2 — 2026-08-01
-
-- 锁屏专辑图 View 脱离后释放背景、单帧缓存和静态处理结果；
-- 设置页切换动画调整为 `350ms`；
-- 开关按下即显示反馈，并移除逐次创建的透明度动画；
-- 模块列表使用独立简洁摘要。
 
 ## 历代核心实现总结
 
