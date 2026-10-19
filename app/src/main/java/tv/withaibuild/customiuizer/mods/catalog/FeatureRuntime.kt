@@ -32,7 +32,7 @@ class FeatureRuntime(
     }
     internal val environment: RomEnvironment by environmentLazy
 
-    private val resolverLazy = lazy(LazyThreadSafetyMode.NONE) { resolverForTest ?: HookTargetResolver(classLoader) }
+    private val resolverLazy = lazy(LazyThreadSafetyMode.SYNCHRONIZED) { resolverForTest ?: HookTargetResolver(classLoader) }
     val resolver: HookTargetResolver by resolverLazy
 
     /** Test-only override to avoid lazy reflection. Never used in production. */

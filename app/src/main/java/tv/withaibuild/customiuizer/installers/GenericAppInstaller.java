@@ -1,6 +1,7 @@
 package tv.withaibuild.customiuizer.installers;
 
 import android.app.Application;
+import java.util.concurrent.atomic.AtomicBoolean;
 import android.content.Context;
 
 import io.github.libxposed.api.XposedModuleInterface.PackageReadyParam;
@@ -12,6 +13,7 @@ import tv.withaibuild.customiuizer.mods.Various;
 import tv.withaibuild.customiuizer.mods.utils.HookerClassHelper.AfterHookCallback;
 import tv.withaibuild.customiuizer.mods.utils.HookerClassHelper.MethodHook;
 import tv.withaibuild.customiuizer.mods.utils.ModuleHelper;
+import tv.withaibuild.customiuizer.mods.utils.XposedHelpers;
 
 /**
  * Installer for generic applications that are not part of a dedicated process scope.
@@ -38,10 +40,12 @@ public final class GenericAppInstaller {
                 || MainModule.mPrefs.getStringAsInt("controls_volumemedia_down", 0) > 0) && MainModule.mPrefs.getStringSet("controls_mediaplayer_apps").contains(pkg);
 
         if (isStatusBarColor || isNoOverscroll || controlMedia) {
-            ModuleHelper.findAndHookMethod(Application.class, "attach", Context.class, new MethodHook() {
+            ModuleHelper.findAndHookMethodWithId(Application.class, "attach", XposedHelpers.HOOK_ID_APPLICATION_ATTACH, Context.class, new MethodHook() {
+                private final AtomicBoolean installed = new AtomicBoolean();
                 @Override
                 protected void after(AfterHookCallback param) throws Throwable {
                     if (!isTargetPackage(param.getThisObject(), lpparam)) return;
+                    if (param.getThrowable() != null || !installed.compareAndSet(false, true)) return;
                     if (isStatusBarColor) {
                         SystemStatusBarAndClockHooks.StatusBarBackgroundCompatHook(lpparam);
                         SystemStatusBarAndClockHooks.StatusBarBackgroundHook(lpparam);

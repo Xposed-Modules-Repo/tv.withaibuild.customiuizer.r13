@@ -352,4 +352,44 @@ class PreferenceBootstrapTest {
         assertEquals("resolve_remote", bootstrap.lastFailureStage)
         assertEquals(error, bootstrap.lastError)
     }
+
+    @Test
+    fun watcherRecoversSnapshotReadWithoutRegisteringTwice() {
+        fake.put("feature", true)
+        val bootstrap = bootstrap()
+        fake.setRegisterException(RuntimeException("register failed"))
+        assertEquals(PreferenceBootstrap.State.SNAPSHOT_PENDING_LISTENER, bootstrap.start())
+        fake.setRegisterException(null)
+        fake.setGetAllException(RuntimeException("second read failed"))
+        bootstrap.ensureWatcher()
+        assertEquals(1, fake.registerCount)
+        fake.setGetAllException(null)
+        assertEquals(PreferenceBootstrap.State.LOADED, bootstrap.ensureWatcher())
+        assertEquals(1, fake.registerCount)
+    }
+
+    @Test
+    fun nullKeyNotificationReplacesWholeSnapshot() {
+        fake.put("pref_key_old", true)
+        val bootstrap = bootstrap()
+        bootstrap.start()
+        fake.replaceAndNotifyAll(mapOf("pref_key_new" to 42))
+        assertFalse(snapshot.containsKey("old"))
+        assertEquals(42, snapshot.getInt("new", 0))
+        fake.replaceAndNotifyAll(emptyMap())
+        assertEquals(0, snapshot.size)
+        assertEquals(PreferenceBootstrap.State.VALID_EMPTY, bootstrap.state)
+    }
+
+    @Test
+    fun partiallyRegisteredListenerIsRolledBackBeforeRetry() {
+        fake.put("pref_key_feature", true)
+        fake.registerFailureAfterSideEffect = RuntimeException("registered then failed")
+        val bootstrap = bootstrap()
+        assertEquals(PreferenceBootstrap.State.SNAPSHOT_PENDING_LISTENER, bootstrap.start())
+        assertTrue(fake.activeListenerIdentities.isEmpty())
+        fake.registerFailureAfterSideEffect = null
+        assertEquals(PreferenceBootstrap.State.LOADED, bootstrap.ensureWatcher())
+        assertEquals(1, fake.activeListenerIdentities.size)
+    }
 }

@@ -7,14 +7,14 @@ import java.util.Properties
 class ModuleMetadataTest {
 
     @Test
-    fun modulePropDeclaresApi101WithTarget102() {
+    fun modulePropRequiresApi102AndStaticScope() {
         val stream = javaClass.classLoader?.getResourceAsStream("META-INF/xposed/module.prop")
             ?: error("META-INF/xposed/module.prop not found on test classpath")
         val props = Properties()
         stream.use { props.load(it) }
-        assertEquals("101", props.getProperty("minApiVersion"))
+        assertEquals("102", props.getProperty("minApiVersion"))
         assertEquals("102", props.getProperty("targetApiVersion"))
-        assertEquals("false", props.getProperty("staticScope"))
+        assertEquals("true", props.getProperty("staticScope"))
     }
 
     @Test

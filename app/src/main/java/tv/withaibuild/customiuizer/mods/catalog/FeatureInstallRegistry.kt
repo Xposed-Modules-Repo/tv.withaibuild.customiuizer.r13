@@ -28,8 +28,8 @@ import java.util.concurrent.ConcurrentHashMap
  * Fatal JVM errors ([OutOfMemoryError], [ThreadDeath], [VirtualMachineError])
  * and wrapped fatal causes are always rethrown via [RuntimeFatality.throwIfFatal].
  * All other failures are isolated to the single feature and conservatively
- * treated as transient unless the installer explicitly returns
- * [FeatureInstallResult.FailedPermanent].
+ * terminal once installer side effects may have begun. Explicit transient
+ * results are reserved for failures known to have installed no hooks.
  */
 object FeatureInstallRegistry {
 
@@ -41,10 +41,18 @@ object FeatureInstallRegistry {
     private val registerLock = Any()
 
     /** Typed, collision-proof per-process feature key. */
-    private data class FeatureStateKey(
+    private class FeatureStateKey(
         val processName: String,
-        val canonicalId: String
-    )
+        val canonicalId: String,
+        val classLoader: ClassLoader
+    ) {
+        override fun equals(other: Any?): Boolean = other is FeatureStateKey &&
+            processName == other.processName && canonicalId == other.canonicalId &&
+            classLoader === other.classLoader
+
+        override fun hashCode(): Int =
+            31 * (31 * processName.hashCode() + canonicalId.hashCode()) + System.identityHashCode(classLoader)
+    }
 
     private fun normalizeId(id: String): String =
         FeatureIdentity.normalizeLookupId(id)
@@ -141,7 +149,7 @@ object FeatureInstallRegistry {
         phase: InstallPhase,
         runtime: FeatureRuntime
     ): FeatureInstallResult {
-        val stateKey = FeatureStateKey(runtime.processName, spec.id)
+        val stateKey = FeatureStateKey(runtime.processName, spec.id, runtime.classLoader)
 
         // Fast, non-mutating state check. Concurrent readers may pass this point,
         // but only one will win the INSTALLING claim below.
@@ -211,7 +219,14 @@ object FeatureInstallRegistry {
 
         // From this point on the current thread owns INSTALLING. Every exit path
         // must replace INSTALLING with a terminal or transient state.
-        val result = runCompatibilityAndInstaller(spec, scope, phase, runtime, stateKey)
+        val result = try {
+            runCompatibilityAndInstaller(spec, runtime)
+        } catch (t: Throwable) {
+            // Only fatal errors escape the local boundaries. Release ownership
+            // before propagating, without exposing an unclaimed intermediate state.
+            states[stateKey] = FeatureState.FAILED_TRANSIENT
+            throw t
+        }
 
         val finalState = when (result) {
             is FeatureInstallResult.Installed -> FeatureState.INSTALLED
@@ -293,17 +308,12 @@ object FeatureInstallRegistry {
      */
     private fun runCompatibilityAndInstaller(
         spec: FeatureSpec,
-        scope: ProcessScope,
-        phase: InstallPhase,
-        runtime: FeatureRuntime,
-        stateKey: FeatureStateKey
+        runtime: FeatureRuntime
     ): FeatureInstallResult {
         val compatibility = try {
             spec.compatibilityCheck(runtime)
         } catch (t: Throwable) {
-            states.remove(stateKey)
             RuntimeFatality.throwIfFatal(t)
-            states[stateKey] = FeatureState.FAILED_TRANSIENT
             record(spec, compatibility = CompatibilityState.INCOMPATIBLE, reasonCode = ReasonCode.TARGET_NOT_FOUND, detail = t.message)
             return FeatureInstallResult.Incompatible(t.message ?: "compatibility check threw")
         }
@@ -312,17 +322,17 @@ object FeatureInstallRegistry {
         record(spec, compatibility = compatibility.compatibility, reasonCode = compatibility.reasonCode, detail = compatibility.detail)
 
         if (compatibility.compatibility == CompatibilityState.INCOMPATIBLE) {
-            states[stateKey] = FeatureState.FAILED_TRANSIENT
             return FeatureInstallResult.Incompatible("required target not compatible")
         }
 
         return try {
             spec.installer(runtime, compatibility.hookResult)
         } catch (t: Throwable) {
-            states.remove(stateKey)
             RuntimeFatality.throwIfFatal(t)
-            states[stateKey] = FeatureState.FAILED_TRANSIENT
-            classifyThrownException(t)
+            // Hook side effects may already exist. An exception is not proof
+            // that a retry is safe; explicit no-side-effect failures can return
+            // FailedTransient themselves.
+            FeatureInstallResult.FailedPermanent("${t.javaClass.simpleName}: ${t.message}")
         }
     }
 
@@ -378,24 +388,6 @@ object FeatureInstallRegistry {
         }
         return Triple(outcome, reasonCode, detail)
     }
-
-    /**
-     * Conservative classification for exceptions escaping the installer.
-     *
-     * - Class/member not found at install time usually means the target is not
-     *   yet prepared by the framework; allow a retry.
-     * - All other non-fatal exceptions are treated as transient to avoid a single
-     *   hiccup permanently disabling a feature.
-     */
-    private fun classifyThrownException(t: Throwable): FeatureInstallResult =
-        when (t) {
-            is ClassNotFoundException,
-            is NoClassDefFoundError,
-            is NoSuchMethodError,
-            is NoSuchFieldError ->
-                FeatureInstallResult.FailedTransient("${t.javaClass.simpleName}: ${t.message}")
-            else -> FeatureInstallResult.FailedTransient("${t.javaClass.simpleName}: ${t.message}")
-        }
 
     /** Test-only reset of per-process install state. Production code must not call this. */
     @VisibleForTesting

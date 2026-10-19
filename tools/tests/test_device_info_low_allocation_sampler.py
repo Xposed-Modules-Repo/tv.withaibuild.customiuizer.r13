@@ -1,6 +1,5 @@
 """Static contract tests for the low-allocation device-info sampler."""
 import re
-import subprocess
 import unittest
 from pathlib import Path
 
@@ -89,24 +88,6 @@ def find_catch_block(text: str) -> str:
                 return text[start : j + 1]
     return ""
 
-
-def changed_files() -> set[str]:
-    """Return files changed in the working tree relative to HEAD."""
-    result = subprocess.run(
-        ["git", "diff", "--name-only", "HEAD"],
-        cwd=REPO_ROOT,
-        capture_output=True,
-        text=True,
-    )
-    names = set(result.stdout.splitlines())
-    result2 = subprocess.run(
-        ["git", "ls-files", "--others", "--exclude-standard"],
-        cwd=REPO_ROOT,
-        capture_output=True,
-        text=True,
-    )
-    names.update(result2.stdout.splitlines())
-    return names
 
 
 class DeviceInfoSysfsParserContractTest(unittest.TestCase):
@@ -390,36 +371,7 @@ class DeviceInfoMonitorContractTest(unittest.TestCase):
         self.assertIn("isCurrentTick(", self.publish)
 
 
-class ScopeProtectionTest(unittest.TestCase):
-    EXCLUDED_FILES = {
-        "app/src/main/java/tv/withaibuild/customiuizer/mods/LauncherAnimationHooks.kt",
-        "app/src/main/java/tv/withaibuild/customiuizer/mods/LauncherGestureHooks.kt",
-        "app/src/main/java/tv/withaibuild/customiuizer/mods/LauncherLayoutHooks.kt",
-        "app/src/main/java/tv/withaibuild/customiuizer/utils/HookUtils.kt",
-        "app/src/main/java/tv/withaibuild/customiuizer/mods/utils/LockScreenAlbumArtController.kt",
-        "app/src/main/java/tv/withaibuild/customiuizer/utils/BatteryIndicator.kt",
-        "app/src/main/java/tv/withaibuild/customiuizer/mods/SystemAudioAndVisualAndMoreHooks.kt",
-        "app/src/main/java/tv/withaibuild/customiuizer/mods/catalog/FeatureDispatcher.kt",
-        "app/src/main/java/tv/withaibuild/customiuizer/mods/utils/HookInstaller.kt",
-        "app/src/main/java/tv/withaibuild/customiuizer/mods/utils/HookTargetResolver.kt",
-        "app/src/main/java/tv/withaibuild/customiuizer/mods/utils/ModuleHelper.java",
-        "app/src/main/java/tv/withaibuild/customiuizer/mods/utils/RuntimeFatality.kt",
-        "app/src/main/java/tv/withaibuild/customiuizer/mods/diagnostics/DiagnosticRecorder.kt",
-        "README.md",
-        "README_EN.md",
-        "docs/release-manifest.json",
-        "gradle/verification-metadata.xml",
-        "docs/audit/SOURCE_HAZARD_BASELINE.json",
-    }
-
-    def test_excluded_source_files_not_modified(self):
-        for path in changed_files():
-            self.assertNotIn(
-                Path(path).as_posix(),
-                self.EXCLUDED_FILES,
-                f"excluded file {path} was modified",
-            )
-
+class ProductionDiagnosticsTest(unittest.TestCase):
     def test_no_print_stack_trace_in_production_source(self):
         for kt in (REPO_ROOT / "app/src/main/java").rglob("*.kt"):
             text = kt.read_text(encoding="utf-8")

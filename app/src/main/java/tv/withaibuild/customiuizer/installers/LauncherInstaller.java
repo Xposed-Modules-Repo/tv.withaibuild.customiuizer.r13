@@ -1,6 +1,7 @@
 package tv.withaibuild.customiuizer.installers;
 
 import android.app.Application;
+import java.util.concurrent.atomic.AtomicBoolean;
 import android.content.Context;
 import tv.withaibuild.customiuizer.utils.PrefMap;
 
@@ -11,6 +12,7 @@ import tv.withaibuild.customiuizer.mods.LauncherAnimationHooks;
 import tv.withaibuild.customiuizer.mods.utils.HookerClassHelper.AfterHookCallback;
 import tv.withaibuild.customiuizer.mods.utils.HookerClassHelper.MethodHook;
 import tv.withaibuild.customiuizer.mods.utils.ModuleHelper;
+import tv.withaibuild.customiuizer.mods.utils.XposedHelpers;
 import tv.withaibuild.customiuizer.mods.LauncherFolderHooks;
 import tv.withaibuild.customiuizer.mods.LauncherGestureHooks;
 import tv.withaibuild.customiuizer.mods.LauncherIconHooks;
@@ -104,10 +106,12 @@ public final class LauncherInstaller {
     }
 
     public static void installApplication(final PackageReadyParam lpparam) {
-        ModuleHelper.findAndHookMethod(Application.class, "attach", Context.class, new MethodHook() {
+        ModuleHelper.findAndHookMethodWithId(Application.class, "attach", XposedHelpers.HOOK_ID_APPLICATION_ATTACH, Context.class, new MethodHook() {
+            private final AtomicBoolean installed = new AtomicBoolean();
             @Override
             protected void after(AfterHookCallback param) throws Throwable {
                 if (!isTargetPackage(param.getThisObject(), lpparam)) return;
+                if (param.getThrowable() != null || !installed.compareAndSet(false, true)) return;
                 handleLoadLauncher(lpparam);
             }
         });

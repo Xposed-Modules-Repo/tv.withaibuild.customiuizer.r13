@@ -4,13 +4,23 @@ plugins {
     alias(libs.plugins.android.application)
 }
 
+kotlin {
+    compilerOptions {
+        languageVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_4)
+        apiVersion.set(org.jetbrains.kotlin.gradle.dsl.KotlinVersion.KOTLIN_2_4)
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.fromTarget("25"))
+    }
+}
+
+val officialRelease = providers.gradleProperty("officialRelease").orNull == "true"
+
 val keystorePropertiesPath =
     providers.gradleProperty("customiuizerA13KeystoreProperties").orNull
         ?: providers.environmentVariable("CUSTOMIUIZER_A13_KEYSTORE_PROPERTIES").orNull
 
 val keystorePropertiesFile = keystorePropertiesPath?.let(::file)
 val keystoreProperties = Properties()
-val hasReleaseSigning = if (keystorePropertiesFile != null && keystorePropertiesFile.isFile) {
+val hasReleaseSigning = if (officialRelease && keystorePropertiesFile != null && keystorePropertiesFile.isFile) {
     keystorePropertiesFile.inputStream().use { keystoreProperties.load(it) }
     listOf("storeFile", "storePassword", "keyAlias", "keyPassword").all { key ->
         keystoreProperties.getProperty(key).isNullOrBlank().not()
@@ -19,8 +29,8 @@ val hasReleaseSigning = if (keystorePropertiesFile != null && keystoreProperties
     false
 }
 
-val lastVersion = 140
-val lastVersionName = "r13.12.2"
+val lastVersion = 141
+val lastVersionName = "r13.13.0"
 val supportedLocales = setOf(
     "ru-rRU",
     "zh-rCN",
@@ -35,7 +45,9 @@ val supportedLocales = setOf(
 
 android {
     namespace = "tv.withaibuild.customiuizer"
-    compileSdk = 36
+    compileSdk = 37
+    // Keep the pinned SDK package aligned with tools/ci_install_android_sdk.sh.
+    buildToolsVersion = "36.0.0"
 
     signingConfigs {
         create("v2") {
@@ -116,8 +128,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_25
+        targetCompatibility = JavaVersion.VERSION_25
     }
     java {
         toolchain {
@@ -197,6 +209,7 @@ dependencies {
 
     implementation(libs.libxposed.service)
     implementation(platform(libs.kotlin.bom))
+    implementation(libs.kotlin.stdlib)
     implementation(libs.commons.lang3)
     implementation(libs.androidx.preference)
     implementation(libs.androidx.palette)

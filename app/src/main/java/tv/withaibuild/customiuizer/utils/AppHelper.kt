@@ -11,7 +11,7 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
-import io.github.libxposed.service.RemotePreferences
+import tv.withaibuild.customiuizer.mods.utils.RuntimeFatality
 import tv.withaibuild.customiuizer.R
 import tv.withaibuild.customiuizer.mods.GlobalActions
 
@@ -24,6 +24,7 @@ object AppHelper {
     var appPrefs: SharedPreferences? = null
 
     @JvmField
+    @Volatile
     var moduleActive: Boolean = false
 
     @JvmField
@@ -33,9 +34,6 @@ object AppHelper {
     @JvmStatic
     fun shouldReportModuleInactive(): Boolean =
         moduleConnectionObserved && !moduleActive
-
-    @JvmField
-    var remotePrefs: RemotePreferences? = null
 
     private const val TAG = "LSPosed-Bridge"
 
@@ -57,6 +55,10 @@ object AppHelper {
     @Volatile
     var mirrorDirty: Boolean = false
 
+    // The SDK updates its cache before commit returns. Remember failed deletions
+    // and resend values even if that cache now appears equal to local preferences.
+    private val pendingMirrorRemovals = HashSet<String>()
+
     @JvmStatic
     @Synchronized
     fun setMirrorIgnoreKeys(keys: Set<String>) {
@@ -67,6 +69,7 @@ object AppHelper {
     @Synchronized
     fun resetMirrorState() {
         mirrorDirty = false
+        pendingMirrorRemovals.clear()
     }
 
     private fun isMirroredKey(key: String): Boolean =
@@ -82,7 +85,7 @@ object AppHelper {
             is String -> editor.putString(key, value)
             is Set<*> -> {
                 @Suppress("UNCHECKED_CAST")
-                editor.putStringSet(key, value as Set<String>)
+                editor.putStringSet(key, LinkedHashSet(value as Set<String>))
             }
         }
     }
@@ -90,62 +93,71 @@ object AppHelper {
     @JvmStatic
     @Synchronized
     fun onLocalPreferenceChanged(remote: SharedPreferences?, key: String?, value: Any?) {
+        if (key != null && !isMirroredKey(key)) return
         val target = remote ?: run { mirrorDirty = true; return }
         if (key == null) {
             // 整个 preference 文件被清空，走全量 reconciliation。
             reconcileRemotePreferences(target)
             return
         }
-        if (!isMirroredKey(key)) return
-
-        val editor = target.edit()
-        putPreferenceValue(editor, key, value)
-        val committed = try { editor.commit() } catch (t: Throwable) {
-            if (t is OutOfMemoryError || t is ThreadDeath || t is VirtualMachineError) throw t
+        if (value == null) pendingMirrorRemovals.add(key) else pendingMirrorRemovals.remove(key)
+        val committed = try {
+            val editor = target.edit()
+            putPreferenceValue(editor, key, value)
+            editor.commit()
+        } catch (t: Throwable) {
+            RuntimeFatality.throwIfFatal(t)
             false
         }
-        if (!committed) mirrorDirty = true
+        if (committed) pendingMirrorRemovals.remove(key) else mirrorDirty = true
     }
 
     @JvmStatic
     @Synchronized
-    fun reconcileRemotePreferences(remote: SharedPreferences?) {
-        val target = remote ?: return
-        val local = appPrefs
+    fun reconcileRemotePreferences(remote: SharedPreferences?, local: SharedPreferences? = appPrefs) {
+        val target = remote ?: run { mirrorDirty = true; return }
         if (local == null) {
             mirrorDirty = true
             return
         }
         val localAll = try { local.all } catch (t: Throwable) {
-            if (t is OutOfMemoryError || t is ThreadDeath || t is VirtualMachineError) throw t
+            RuntimeFatality.throwIfFatal(t)
             mirrorDirty = true
             return
         }
         val remoteAll = try { target.all } catch (t: Throwable) {
-            if (t is OutOfMemoryError || t is ThreadDeath || t is VirtualMachineError) throw t
+            RuntimeFatality.throwIfFatal(t)
             mirrorDirty = true
             return
         }
 
-        val editor = target.edit()
+        val editor = try { target.edit() } catch (t: Throwable) {
+            RuntimeFatality.throwIfFatal(t)
+            mirrorDirty = true
+            return
+        }
         var hasChange = false
 
         // 1. 同步本地镜像范围的 key 到 remote
         for ((key, value) in localAll) {
             if (!isMirroredKey(key)) continue
-            if (remoteAll[key] != value) {
+            if (mirrorDirty || remoteAll[key] != value) {
                 putPreferenceValue(editor, key, value)
                 hasChange = true
             }
         }
 
         // 2. 删除镜像范围内本地已不存在的 remote key（不盲目 clear，保留 remote-only）
+        pendingMirrorRemovals.removeAll { !isMirroredKey(it) || localAll.containsKey(it) }
         for (key in remoteAll.keys) {
             if (!isMirroredKey(key)) continue
             if (!localAll.containsKey(key)) {
-                editor.remove(key)
-                hasChange = true
+                pendingMirrorRemovals.add(key)
             }
+        }
+        for (key in pendingMirrorRemovals) {
+            editor.remove(key)
+            hasChange = true
         }
 
         if (!hasChange) {
@@ -154,11 +166,12 @@ object AppHelper {
         }
 
         val committed = try { editor.commit() } catch (t: Throwable) {
-            if (t is OutOfMemoryError || t is ThreadDeath || t is VirtualMachineError) throw t
+            RuntimeFatality.throwIfFatal(t)
             false
         }
         if (committed) {
             mirrorDirty = false
+            pendingMirrorRemovals.clear()
         } else {
             mirrorDirty = true
         }

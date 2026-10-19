@@ -8,56 +8,7 @@ REPO = Path(__file__).resolve().parent.parent.parent
 FILE = REPO / "app" / "src" / "main" / "java" / "tv" / "withaibuild" / "customiuizer" / "mods" / "utils" / "ModuleHelper.java"
 
 
-TARGET_METHODS = [
-    (
-        "public static CustomMethodUnhooker hookMethod(Method method, MethodHook callback)",
-        "null",
-    ),
-    (
-        "public static CustomMethodUnhooker findAndHookMethod(String className, ClassLoader classLoader, String methodName, Object... parameterTypesAndCallback)",
-        "null",
-    ),
-    (
-        "public static CustomMethodUnhooker findAndHookMethod(Class<?> clazz, String methodName, Object... parameterTypesAndCallback)",
-        "null",
-    ),
-    (
-        "public static boolean findAndHookMethodSilently(String className, ClassLoader classLoader, String methodName, Object... parameterTypesAndCallback)",
-        "false",
-    ),
-    (
-        "public static boolean findAndHookMethodSilently(Class<?> clazz, String methodName, Object... parameterTypesAndCallback)",
-        "false",
-    ),
-    (
-        "public static CustomMethodUnhooker findAndHookConstructor(String className, ClassLoader classLoader, Object... parameterTypesAndCallback)",
-        "null",
-    ),
-    (
-        "public static void hookAllConstructors(String className, ClassLoader classLoader, MethodHook callback)",
-        "void",
-    ),
-    (
-        "public static void hookAllConstructors(Class<?> hookClass, MethodHook callback)",
-        "void",
-    ),
-    (
-        "public static void hookAllMethods(String className, ClassLoader classLoader, String methodName, MethodHook callback)",
-        "void",
-    ),
-    (
-        "public static void hookAllMethods(Class<?> hookClass, String methodName, MethodHook callback)",
-        "void",
-    ),
-    (
-        "public static boolean hookAllMethodsSilently(String className, ClassLoader classLoader, String methodName, MethodHook callback)",
-        "false",
-    ),
-    (
-        "public static boolean hookAllMethodsSilently(Class<?> hookClass, String methodName, MethodHook callback)",
-        "false",
-    ),
-]
+from tools.tests.module_helper_contracts import HOOK_INSTALL_TARGETS as TARGET_METHODS
 
 
 class ModuleHelperHookInstallFatalityContractTest(unittest.TestCase):
@@ -68,6 +19,14 @@ class ModuleHelperHookInstallFatalityContractTest(unittest.TestCase):
     # ------------------------------------------------------------------
     # Helper contract
     # ------------------------------------------------------------------
+
+    def test_unidentified_class_entry_delegates_to_the_same_fatal_boundary(self):
+        body = self._extract_method_body(
+            "public static CustomMethodUnhooker findAndHookMethod(Class<?> clazz, String methodName, Object... parameterTypesAndCallback)"
+        )
+        self.assertIsNotNone(body)
+        self.assertIn("return findAndHookMethodWithId(clazz, methodName, null, parameterTypesAndCallback);", body)
+        self.assertNotIn("catch", body)
 
     def test_helper_exists_unique(self):
         matches = list(re.finditer(

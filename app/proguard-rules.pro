@@ -21,6 +21,7 @@
 -allowaccessmodification
 
 -dontwarn kotlin.jvm.internal.SourceDebugExtension
+-dontwarn io.github.libxposed.annotation.**
 -dontwarn android.**
 -dontwarn miui.**
 # -dontnote **

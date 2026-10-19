@@ -1,7 +1,0 @@
-Starting: Intent { cmp=tv.withaibuild.customiuizer.r13/.MainActivity }
-Status: ok
-LaunchState: COLD
-Activity: tv.withaibuild.customiuizer.r13/.MainActivity
-TotalTime: 487
-WaitTime: 512
-Complete

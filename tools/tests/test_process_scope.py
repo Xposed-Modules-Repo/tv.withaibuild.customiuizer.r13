@@ -15,7 +15,8 @@ def read(rel: str) -> str:
 class ProcessScopeTests(unittest.TestCase):
     def test_main_module_delegates_to_process_scopes(self):
         main = read("tv/withaibuild/customiuizer/MainModule.java")
-        self.assertIn("ProcessScopes.isRejected(pkg, processName)", main)
+        self.assertIn("ProcessScopes.resolve(pkg, processName)", main)
+        self.assertIn("!scope.isInstallable()", main)
 
     def test_process_scopes_has_when_expression(self):
         text = read("tv/withaibuild/customiuizer/mods/utils/ProcessScope.kt")

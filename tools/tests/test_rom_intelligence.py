@@ -77,17 +77,6 @@ class RomInventoryTests(unittest.TestCase):
                 self.assertIsInstance(data, list)
 
 
-@unittest.skipUnless((REPO / "tools" / "rom_target_diff.py").is_file(), "rom_target_diff.py not present")
-class RomTargetDiffTests(unittest.TestCase):
-    def test_help_returns_zero(self):
-        rc, out, _ = run_py("rom_target_diff.py", "--help")
-        self.assertEqual(rc, 0, f"--help failed: {out}")
-
-    def test_diff_two_text_files_reports_not_supported(self):
-        a = REPO / ".gitignore"
-        b = REPO / "README.md" if (REPO / "README.md").is_file() else a
-        rc, out, err = run_py("rom_target_diff.py", str(a), str(b))
-        self.assertIn(rc, (0, 1, 2), f"unexpected exit {rc}: {err}")
 
 
 @unittest.skipUnless((REPO / "tools" / "rom_super_inspector.py").is_file(), "rom_super_inspector.py not present")

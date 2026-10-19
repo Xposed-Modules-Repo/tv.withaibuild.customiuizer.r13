@@ -128,7 +128,7 @@ class MainModuleSystemUiRoutingTest {
         fakeSharedPreferences.failFirstRegister = false
         fakeSharedPreferences.setAll(prefs)
         val module = MainModule()
-        module.attachFramework(FakeXposedInterface.create())
+        module.attachFramework(FakeXposedInterface.create()) {}
         module.onModuleLoaded(moduleLoadedParam("com.android.systemui"))
         return module
     }

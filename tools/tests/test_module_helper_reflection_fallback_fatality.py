@@ -20,20 +20,7 @@ CONTEXT_METHODS = (
 
 TARGET_METHODS = FIELD_METHODS + CONTEXT_METHODS
 
-HOOK_INSTALL_METHODS = [
-    "public static CustomMethodUnhooker hookMethod(Method method, MethodHook callback)",
-    "public static CustomMethodUnhooker findAndHookMethod(String className, ClassLoader classLoader, String methodName, Object... parameterTypesAndCallback)",
-    "public static CustomMethodUnhooker findAndHookMethod(Class<?> clazz, String methodName, Object... parameterTypesAndCallback)",
-    "public static boolean findAndHookMethodSilently(String className, ClassLoader classLoader, String methodName, Object... parameterTypesAndCallback)",
-    "public static boolean findAndHookMethodSilently(Class<?> clazz, String methodName, Object... parameterTypesAndCallback)",
-    "public static CustomMethodUnhooker findAndHookConstructor(String className, ClassLoader classLoader, Object... parameterTypesAndCallback)",
-    "public static void hookAllConstructors(String className, ClassLoader classLoader, MethodHook callback)",
-    "public static void hookAllConstructors(Class<?> hookClass, MethodHook callback)",
-    "public static void hookAllMethods(String className, ClassLoader classLoader, String methodName, MethodHook callback)",
-    "public static void hookAllMethods(Class<?> hookClass, String methodName, MethodHook callback)",
-    "public static boolean hookAllMethodsSilently(String className, ClassLoader classLoader, String methodName, MethodHook callback)",
-    "public static boolean hookAllMethodsSilently(Class<?> hookClass, String methodName, MethodHook callback)",
-]
+from tools.tests.module_helper_contracts import HOOK_INSTALL_METHODS as HOOK_INSTALL_METHODS
 
 
 class ModuleHelperReflectionFallbackFatalityContractTest(unittest.TestCase):

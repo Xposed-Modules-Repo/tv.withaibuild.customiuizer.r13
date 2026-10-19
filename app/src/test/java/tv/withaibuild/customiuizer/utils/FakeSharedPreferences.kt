@@ -52,6 +52,7 @@ class FakeSharedPreferences : SharedPreferences {
 
     private var getAllException: Throwable? = null
     private var registerException: Throwable? = null
+    var registerFailureAfterSideEffect: Throwable? = null
 
     fun put(key: String, value: Any?) {
         values[key] = value
@@ -73,6 +74,12 @@ class FakeSharedPreferences : SharedPreferences {
         values.putAll(map)
         changed.addAll(map.keys)
         for (key in changed) dispatchChange(key)
+    }
+
+    fun replaceAndNotifyAll(map: Map<String, Any?>) {
+        values.clear()
+        values.putAll(map)
+        dispatchChange(null)
     }
 
     fun reset() {
@@ -97,7 +104,7 @@ class FakeSharedPreferences : SharedPreferences {
         registerException = e
     }
 
-    private fun dispatchChange(key: String) {
+    private fun dispatchChange(key: String?) {
         for (l in listeners) l.onSharedPreferenceChanged(this, key)
     }
 
@@ -151,6 +158,7 @@ class FakeSharedPreferences : SharedPreferences {
         }
         registerCount++
         if (!listeners.contains(listener)) listeners.add(listener)
+        registerFailureAfterSideEffect?.let { throw it }
     }
 
     override fun unregisterOnSharedPreferenceChangeListener(listener: SharedPreferences.OnSharedPreferenceChangeListener) {

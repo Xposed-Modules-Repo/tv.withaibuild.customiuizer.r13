@@ -4,6 +4,8 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 
 import java.util.Map;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -161,13 +163,13 @@ public class PreferenceBootstrap {
      */
     public State ensureWatcher() {
         synchronized (lock) {
-            if (watcherRegistered) return state;
+            if (watcherRegistered && (state == State.LOADED || state == State.VALID_EMPTY)) return state;
             if (remote == null) {
                 // No remote yet; start from the top.
                 return start();
             }
 
-            if (!ensureListenerLocked()) {
+            if (!watcherRegistered && !ensureListenerLocked()) {
                 // Listener still failed. Keep current state, do not downgrade
                 // a previously loaded snapshot just because updates are missing.
                 return state;
@@ -240,6 +242,14 @@ public class PreferenceBootstrap {
             this.watcherRegistered = true;
             return true;
         } catch (Throwable t) {
+            // A remote implementation may register before throwing. Roll back
+            // this exact listener before a later bounded attempt creates another.
+            try {
+                remote.unregisterOnSharedPreferenceChangeListener(l);
+            } catch (Throwable cleanup) {
+                RuntimeFatality.throwIfFatal(cleanup);
+                XposedHelpers.log("PreferenceBootstrap listener rollback failed", cleanup);
+            }
             RuntimeFatality.throwIfFatal(t);
             recordFailure("register_listener", t);
             // Do not pretend the listener is registered.
@@ -253,7 +263,7 @@ public class PreferenceBootstrap {
     }
 
     private void onPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (key == null) return;
+        Set<String> changedKeys = null;
 
         // Serialize the update with snapshot publishing. The actual map is a
         // ConcurrentHashMap, but we hold the bootstrap lock so that a full
@@ -267,20 +277,26 @@ public class PreferenceBootstrap {
 
             // Read the raw value once via getAll() instead of typed getters.
             // This keeps malformed or changed-type values from crashing the update path.
-            Object val;
+            Map<String, ?> all;
             try {
-                Map<String, ?> all = sharedPreferences.getAll();
-                val = all != null ? all.get(key) : null;
+                all = sharedPreferences.getAll();
+                if (all == null) return;
             } catch (Throwable t) {
                 RuntimeFatality.throwIfFatal(t);
                 recordFailure("listener_getAll", t);
                 return;
             }
 
-            if (val == null) {
-                snapshot.remove(key);
+            if (key == null) {
+                // Android clear() notifications may carry a null key. Refresh
+                // atomically and invalidate both removed and newly restored keys.
+                changedKeys = new HashSet<>(snapshot.asMap().keySet());
+                publishSnapshot(all);
+                changedKeys.addAll(snapshot.asMap().keySet());
             } else {
-                snapshot.put(key, val);
+                Object val = all.get(key);
+                if (val == null) snapshot.remove(key);
+                else snapshot.put(key, val);
             }
 
             // Synchronize the published state with the actual snapshot.
@@ -289,9 +305,15 @@ public class PreferenceBootstrap {
             }
         }
 
-        if (!"pref_key_systemui_restart_time".equals(key)) {
-            ModuleHelper.handlePreferenceChanged(key);
+        if (changedKeys != null) {
+            for (String changedKey : changedKeys) notifyPreferenceChanged(changedKey);
+        } else {
+            notifyPreferenceChanged(key);
         }
+    }
+
+    private void notifyPreferenceChanged(String key) {
+        if (!"pref_key_systemui_restart_time".equals(key)) ModuleHelper.handlePreferenceChanged(key);
     }
 
     private void publishSnapshot(Map<String, ?> source) {
@@ -303,13 +325,13 @@ public class PreferenceBootstrap {
     }
 
     private Map<String, Object> normalizeMap(Map<String, ?> source) {
-        PrefMap<String, Object> out = new PrefMap<>();
+        Map<String, Object> out = new HashMap<>(source.size());
         for (Map.Entry<String, ?> e : source.entrySet()) {
             String k = e.getKey();
             Object v = e.getValue();
-            if (k != null && v != null) out.put(k, v);
+            if (k != null && v != null) out.put(k.startsWith("pref_key_") ? k : "pref_key_" + k, v);
         }
-        return out.asMap();
+        return out;
     }
 
     private void recordFailure(String stage, Throwable t) {

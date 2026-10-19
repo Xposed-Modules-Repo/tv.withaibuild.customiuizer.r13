@@ -713,7 +713,7 @@ class FeatureInstallRegistryTest {
     }
 
     @Test
-    fun ordinaryException_releasesClaimAndAllowsRetry() {
+    fun ordinaryException_isTerminalBecauseHooksMayAlreadyExist() {
         var fail = true
         val s = spec(
             id = "ordinaryRetry",
@@ -732,8 +732,8 @@ class FeatureInstallRegistryTest {
         val first = FeatureInstallRegistry.installById("ordinaryRetry", ProcessScope.SYSTEM_UI, InstallPhase.PACKAGE_READY, rt)
         val second = FeatureInstallRegistry.installById("ordinaryRetry", ProcessScope.SYSTEM_UI, InstallPhase.PACKAGE_READY, rt)
 
-        assertTrue(first is FeatureInstallResult.FailedTransient)
-        assertEquals(FeatureInstallResult.Installed(), second)
+        assertTrue(first is FeatureInstallResult.FailedPermanent)
+        assertTrue(second is FeatureInstallResult.FailedPermanent)
     }
 
     @Test
@@ -953,6 +953,54 @@ class FeatureInstallRegistryTest {
             return td
         } catch (vm: VirtualMachineError) {
             return vm
+        }
+    }
+
+    @Test
+    fun sameProcessDifferentClassLoadersHaveIndependentState() {
+        var calls = 0
+        FeatureInstallRegistry.register(spec(installer = { _, _ -> calls++; FeatureInstallResult.Installed() }))
+        val parent = javaClass.classLoader!!
+        val first = FeatureRuntime("same-process", Any(), object : ClassLoader(parent) {}, PrefMap())
+        val second = FeatureRuntime("same-process", Any(), object : ClassLoader(parent) {}, PrefMap())
+        assertTrue(FeatureInstallRegistry.installById("test", ProcessScope.SYSTEM_UI, InstallPhase.PACKAGE_READY, first).isActive)
+        assertTrue(FeatureInstallRegistry.installById("test", ProcessScope.SYSTEM_UI, InstallPhase.PACKAGE_READY, second).isActive)
+        assertEquals(2, calls)
+    }
+
+    @Test
+    fun failureFormattingCannotReenterAnUnclaimedInstaller() {
+        var calls = 0
+        var nested: FeatureInstallResult? = null
+        val rt = runtime("reentrant-failure")
+        val failure = object : RuntimeException() {
+            override val message: String
+                get() {
+                    nested = FeatureInstallRegistry.installById("test", ProcessScope.SYSTEM_UI, InstallPhase.PACKAGE_READY, rt)
+                    return "failed after side effects"
+                }
+        }
+        FeatureInstallRegistry.register(spec(installer = { _, _ ->
+            calls++
+            if (calls == 1) throw failure
+            FeatureInstallResult.Installed()
+        }))
+        val result = FeatureInstallRegistry.installById("test", ProcessScope.SYSTEM_UI, InstallPhase.PACKAGE_READY, rt)
+        assertTrue(result is FeatureInstallResult.FailedPermanent)
+        assertTrue(nested is FeatureInstallResult.FailedTransient)
+        assertEquals(1, calls)
+    }
+
+    @Test
+    fun failedSessionWithOneLiveHookIsTerminal() {
+        val target = tv.withaibuild.customiuizer.mods.utils.HookTargetSpec(
+            "partial", tv.withaibuild.customiuizer.mods.utils.HookOperation.EXACT_METHOD, "Test", "run")
+        val live = tv.withaibuild.customiuizer.mods.utils.HookTargetRecord(target, "partial", installedCount = 1)
+        val partial = HookInstallResult(records = listOf(live), installation = InstallOutcome.FAILED)
+        val empty = HookInstallResult(installation = InstallOutcome.FAILED)
+        with(FeatureCatalog) {
+            assertTrue(partial.toFeatureInstallResult("partial") is FeatureInstallResult.FailedPermanent)
+            assertTrue(empty.toFeatureInstallResult("empty") is FeatureInstallResult.FailedTransient)
         }
     }
 }

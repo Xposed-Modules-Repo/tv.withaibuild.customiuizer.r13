@@ -5,6 +5,7 @@ open class Bundle {
     private val ints = HashMap<String, Int>()
     private val strings = HashMap<String, String?>()
     private val longs = HashMap<String, Long>()
+    private val objects = HashMap<String, java.io.Serializable?>()
 
     constructor()
     constructor(capacity: Int)
@@ -32,9 +33,15 @@ open class Bundle {
     open fun getLong(key: String, defaultValue: Long): Long = longs[key] ?: defaultValue
 
     open fun containsKey(key: String): Boolean =
-        ints.containsKey(key) || strings.containsKey(key) || longs.containsKey(key)
+        ints.containsKey(key) || strings.containsKey(key) || longs.containsKey(key) || objects.containsKey(key)
 
-    open fun isEmpty(): Boolean = ints.isEmpty() && strings.isEmpty() && longs.isEmpty()
+    open fun putSerializable(key: String, value: java.io.Serializable?) { objects[key] = value }
+    open fun getSerializable(key: String): java.io.Serializable? = objects[key]
+    open fun putBoolean(key: String, value: Boolean) { objects[key] = value }
+    open fun getBoolean(key: String): Boolean = objects[key] as? Boolean ?: false
+    open fun getBoolean(key: String, defaultValue: Boolean): Boolean = objects[key] as? Boolean ?: defaultValue
 
-    open fun size(): Int = ints.size + strings.size + longs.size
+    open fun isEmpty(): Boolean = ints.isEmpty() && strings.isEmpty() && longs.isEmpty() && objects.isEmpty()
+
+    open fun size(): Int = ints.size + strings.size + longs.size + objects.size
 }

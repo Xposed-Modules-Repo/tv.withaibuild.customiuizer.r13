@@ -6,7 +6,6 @@ import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.hardware.biometrics.BiometricManager
 import android.hardware.biometrics.BiometricPrompt
-import android.hardware.fingerprint.FingerprintManager
 import android.os.CancellationSignal
 import android.os.Handler
 import android.os.SystemClock

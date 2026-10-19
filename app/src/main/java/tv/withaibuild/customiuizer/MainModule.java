@@ -4,6 +4,7 @@ import android.content.SharedPreferences;
 import android.os.Build;
 
 import androidx.annotation.NonNull;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.github.libxposed.api.XposedModule;
 import io.github.libxposed.api.XposedModuleInterface;
@@ -35,6 +36,10 @@ public class MainModule extends XposedModule {
 
     public static PrefMap<String, Object> mPrefs = new PrefMap<String, Object>();
     String processName;
+    // One entry claim covers both catalog and legacy installers. Never reset after
+    // a partial install: legacy hook APIs cannot roll back every side effect.
+    private final AtomicBoolean packageInstallStarted = new AtomicBoolean();
+    private final AtomicBoolean systemServerInstallStarted = new AtomicBoolean();
 
     private static final class ResourceHooksHolder {
         private static final ResourceHooks INSTANCE = new ResourceHooks();
@@ -80,6 +85,7 @@ public class MainModule extends XposedModule {
     @Override
     public void onSystemServerStarting(final SystemServerStartingParam lpparam) {
         if (!isSupportedAndroidVersion()) return;
+        if (!systemServerInstallStarted.compareAndSet(false, true)) return;
         initPrefs();
         SystemServerInstaller.install(lpparam);
         watchPreferenceChange();
@@ -92,13 +98,14 @@ public class MainModule extends XposedModule {
 
         String pkg = lpparam.getPackageName();
         ProcessScope scope = ProcessScopes.resolve(pkg, processName);
-        if (ProcessScopes.isRejected(pkg, processName)) {
+        if (scope == ProcessScope.SYSTEM_SERVER || !scope.isInstallable()) {
             return;
         }
 
         SharedPreferences remote = getRemotePrefs();
         if (remote == null || !PreferenceLoadRegistry.shouldLoad(remote, pkg)) return;
         initPrefs();
+        if (!packageInstallStarted.compareAndSet(false, true)) return;
 
         if (scope == ProcessScope.INPUT_METHOD) {
             InputMethodInstaller.install(lpparam, pkg);
@@ -157,8 +164,6 @@ public class MainModule extends XposedModule {
             return;
         }
 
-
-
         final boolean isLauncherPkg = scope == ProcessScope.LAUNCHER;
 
         if (isLauncherPkg) {
@@ -167,13 +172,9 @@ public class MainModule extends XposedModule {
             }
             if (LauncherInstaller.hasAnyLauncherApplicationFeature(mPrefs)) {
                 LauncherInstaller.installApplication(lpparam);
-            }
-            if (LauncherInstaller.hasAnyLauncherApplicationFeature(mPrefs)) {
                 watchPreferenceChange();
             }
         }
     }
-
-
 
 }

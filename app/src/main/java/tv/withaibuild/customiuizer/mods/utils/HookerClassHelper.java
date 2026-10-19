@@ -7,12 +7,11 @@ import java.util.List;
 import io.github.libxposed.api.XposedInterface;
 
 /**
- * API 101 adapter for the module's existing before/after callbacks.
+ * Before/after callback semantics on the native API 102 interceptor chain.
  *
  * <p>The old MIUI 14 hooks rely on mutable argument arrays, early returns and
  * after-callback result replacement. Keeping that behavior in one adapter lets
- * each feature move to native API 101 {@link XposedInterface.Chain} hooks in
- * small, testable steps.</p>
+ * native {@link XposedInterface.Chain} installation preserve the A13 behavior.</p>
  */
 public final class HookerClassHelper {
     private HookerClassHelper() {
@@ -169,7 +168,7 @@ public final class HookerClassHelper {
     }
 
     /**
-     * Compatibility hook implemented directly on API 101's interceptor model.
+     * A13 callback behavior implemented on API 102's interceptor model.
      */
     public static class MethodHook implements BeforeMethodCallback, AfterMethodCallback, XposedInterface.Hooker {
         public final int mPriority;

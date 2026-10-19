@@ -13,6 +13,7 @@ import android.os.Build
 import tv.withaibuild.customiuizer.utils.AppHelper
 import tv.withaibuild.customiuizer.utils.AppLocaleController
 import tv.withaibuild.customiuizer.utils.Helpers
+import tv.withaibuild.customiuizer.utils.XposedServiceManager
 
 class MainApplication : Application() {
 
@@ -25,6 +26,7 @@ class MainApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        AppHelper.appPrefs?.let(XposedServiceManager::init)
         AppLocaleController.apply(AppHelper.appPrefs, this)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val nm = getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager

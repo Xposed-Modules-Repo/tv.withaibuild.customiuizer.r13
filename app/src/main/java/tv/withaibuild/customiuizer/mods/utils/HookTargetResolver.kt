@@ -38,6 +38,7 @@ open class HookTargetResolver(private val classLoader: ClassLoader) {
     private val resolutionLog = HashMap<String, ResolutionLog>()
 
     /** Resolve a class by name, caching the result (including a negative result). */
+    @Synchronized
     open fun resolveClass(className: String, diagnosticId: String = DiagnosticIds.HOOK_TARGET_RESOLVER): Class<*>? {
         val k = key("class", className)
         val cached = cache[k]
@@ -58,6 +59,7 @@ open class HookTargetResolver(private val classLoader: ClassLoader) {
      * Resolve a declared method by name and parameter types.
      * Returns null on any failure (no throw) and caches the negative result.
      */
+    @Synchronized
     open fun resolveMethod(
         className: String,
         methodName: String,
@@ -90,6 +92,7 @@ open class HookTargetResolver(private val classLoader: ClassLoader) {
      * Resolve all declared methods with the given name, regardless of signature.
      * Returns null when the class itself cannot be found.
      */
+    @Synchronized
     open fun resolveAllMethods(
         className: String,
         methodName: String,
@@ -112,6 +115,7 @@ open class HookTargetResolver(private val classLoader: ClassLoader) {
      * Resolve a declared constructor by parameter types.
      * Returns null on any failure (no throw) and caches the negative result.
      */
+    @Synchronized
     open fun resolveConstructor(
         className: String,
         vararg parameterTypes: Class<*>,
@@ -143,6 +147,7 @@ open class HookTargetResolver(private val classLoader: ClassLoader) {
      * Resolve all declared constructors of a class.
      * Returns null when the class itself cannot be found.
      */
+    @Synchronized
     open fun resolveAllConstructors(
         className: String,
         diagnosticId: String = DiagnosticIds.HOOK_TARGET_RESOLVER
@@ -163,6 +168,7 @@ open class HookTargetResolver(private val classLoader: ClassLoader) {
      * Resolve a declared field by name.
      * Returns null on any failure (no throw) and caches the negative result.
      */
+    @Synchronized
     open fun resolveField(
         className: String,
         fieldName: String,
@@ -203,6 +209,7 @@ open class HookTargetResolver(private val classLoader: ClassLoader) {
      * records and is passed to [HookInstaller.withSession] to seed the install
      * pass.
      */
+    @Synchronized
     fun evaluateContract(
         contract: HookTargetContract,
         diagnosticId: String
@@ -245,6 +252,7 @@ open class HookTargetResolver(private val classLoader: ClassLoader) {
      * @return a [Resolution] containing the first matching class or `null` and
      *         a stable summary of the failed attempts.
      */
+    @Synchronized
     fun resolveFirstClass(
         diagnosticId: String,
         vararg classNames: String
@@ -259,6 +267,7 @@ open class HookTargetResolver(private val classLoader: ClassLoader) {
     /**
      * Try a list of candidate classes for a method in order.
      */
+    @Synchronized
     fun resolveFirstMethod(
         diagnosticId: String,
         methodName: String,
@@ -275,6 +284,7 @@ open class HookTargetResolver(private val classLoader: ClassLoader) {
     /**
      * Try a list of candidate classes for a field in order.
      */
+    @Synchronized
     fun resolveFirstField(
         diagnosticId: String,
         fieldName: String,
@@ -288,6 +298,7 @@ open class HookTargetResolver(private val classLoader: ClassLoader) {
     }
 
     /** Returns the resolution log for the last [resolveFirstClass] etc. call. */
+    @Synchronized
     fun lastResolution(diagnosticId: String): ResolutionLog? = resolutionLog[diagnosticId]
 
     private fun resolveCandidate(

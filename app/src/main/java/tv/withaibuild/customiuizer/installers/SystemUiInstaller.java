@@ -1,6 +1,7 @@
 package tv.withaibuild.customiuizer.installers;
 
 import android.content.Context;
+import java.util.concurrent.atomic.AtomicBoolean;
 import tv.withaibuild.customiuizer.utils.PrefMap;
 import android.provider.Settings;
 import android.widget.LinearLayout;
@@ -51,18 +52,17 @@ public final class SystemUiInstaller {
         if (MainModule.mPrefs.getInt("system_statusbarheight", 19) > 19) SystemStatusBarAndClockHooks.StatusBarHeightRes();
         if (MainModule.mPrefs.getInt("controls_navbarheight", 19) > 19) Controls.NavbarHeightRes();
             Context mContext = ModuleHelper.findContext(lpparam);
-            long restartTime = Settings.System.getLong(mContext.getContentResolver(), "systemui_restart_time", 0L);
+            long restartTime = mContext == null ? 0L : Settings.System.getLong(mContext.getContentResolver(), "systemui_restart_time", 0L);
             long currentTime = java.lang.System.currentTimeMillis();
             Class<?> NetworkSpeedViewCls = XposedHelpers.findClassIfExists("com.android.systemui.statusbar.views.NetworkSpeedView", lpparam.getClassLoader());
             if (NetworkSpeedViewCls != null) {
                 SystemUIStatusBarHooks.newStyle = LinearLayout.class.isAssignableFrom(NetworkSpeedViewCls);
             }
-            ModuleHelper.findAndHookMethod("com.android.systemui.SystemUIApplication", lpparam.getClassLoader(), "onCreate", new MethodHook() {
-                private boolean isHooked = false;
+            ModuleHelper.findAndHookMethodWithId("com.android.systemui.SystemUIApplication", lpparam.getClassLoader(), "onCreate", XposedHelpers.HOOK_ID_SYSTEMUI_CREATE, new MethodHook() {
+                private final AtomicBoolean isHooked = new AtomicBoolean();
                 @Override
                 protected void after(final AfterHookCallback param) throws Throwable {
-                    if (!isHooked) {
-                        isHooked = true;
+                    if (param.getThrowable() == null && isHooked.compareAndSet(false, true)) {
                         Context context = (Context) XposedHelpers.callMethod(param.getThisObject(), "getApplicationContext");
                         SystemUIStatusBarHooks.setupStatusBar(context);
                         watchPreferences.run();

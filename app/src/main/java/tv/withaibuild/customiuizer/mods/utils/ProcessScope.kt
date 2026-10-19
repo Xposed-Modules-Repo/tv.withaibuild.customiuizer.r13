@@ -31,6 +31,7 @@ enum class ProcessScope {
     /** True if this scope is allowed to load and install module hooks. */
     val isInstallable: Boolean
         get() = this != UNSUPPORTED
+                && this != NETWORK_STACK
                 && this != SYSTEM_UI_PLUGIN
                 && this != SETTINGS_REMOTE
                 && this != SECURITY_CENTER_REMOTE
@@ -71,15 +72,18 @@ object ProcessScopes {
     @JvmStatic
     fun isKnownPackage(packageName: String): Boolean =
         packageName in KNOWN_PACKAGES
-                || packageName.startsWith("com.google.android.inputmethod")
-                || packageName == "com.baidu.input"
-                || packageName == "com.baidu.input_mi"
-                || packageName == "com.iflytek.inputmethod"
-                || packageName == "com.iflytek.inputmethod.miui"
-                || packageName == "com.sohu.inputmethod.sogou"
-                || packageName == "com.sohu.inputmethod.sogou.xiaomi"
-                || packageName.startsWith("com.touchtype.swiftkey")
-                || packageName.startsWith("com.tencent.wetype")
+                || isInputMethodPackage(packageName)
+
+    private fun isInputMethodPackage(packageName: String): Boolean =
+        packageName.startsWith("com.google.android.inputmethod")
+            || packageName == "com.baidu.input"
+            || packageName == "com.baidu.input_mi"
+            || packageName == "com.iflytek.inputmethod"
+            || packageName == "com.iflytek.inputmethod.miui"
+            || packageName == "com.sohu.inputmethod.sogou"
+            || packageName == "com.sohu.inputmethod.sogou.xiaomi"
+            || packageName.startsWith("com.touchtype.swiftkey")
+            || packageName.startsWith("com.tencent.wetype")
 
     /**
      * Classify a package/process pair. This is a pure lookup: no reflection,
@@ -105,15 +109,7 @@ object ProcessScopes {
         "com.android.location.fused" -> ProcessScope.UNSUPPORTED
         else -> when {
             packageName.startsWith("com.android.networkstack") -> ProcessScope.NETWORK_STACK
-            packageName.startsWith("com.google.android.inputmethod")
-                    || packageName == "com.baidu.input"
-                    || packageName == "com.baidu.input_mi"
-                    || packageName == "com.iflytek.inputmethod"
-                    || packageName == "com.iflytek.inputmethod.miui"
-                    || packageName == "com.sohu.inputmethod.sogou"
-                    || packageName == "com.sohu.inputmethod.sogou.xiaomi"
-                    || packageName.startsWith("com.touchtype.swiftkey")
-                    || packageName.startsWith("com.tencent.wetype") -> ProcessScope.INPUT_METHOD
+            isInputMethodPackage(packageName) -> ProcessScope.INPUT_METHOD
             else -> ProcessScope.GENERIC_APP
         }
     }

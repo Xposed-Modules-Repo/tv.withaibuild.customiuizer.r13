@@ -171,10 +171,24 @@ public class ModuleHelper {
     }
 
     public static CustomMethodUnhooker findAndHookMethod(Class<?> clazz, String methodName, Object... parameterTypesAndCallback) {
+        return findAndHookMethodWithId(clazz, methodName, null, parameterTypesAndCallback);
+    }
+
+    public static CustomMethodUnhooker findAndHookMethodWithId(String className, ClassLoader classLoader, String methodName, String id, Object... parameterTypesAndCallback) {
+        try {
+            return findAndHookMethodWithId(XposedHelpers.findClass(className, classLoader), methodName, id, parameterTypesAndCallback);
+        } catch (Throwable t) {
+            throwIfFatal(t);
+            log("Failed to hook " + className + "." + methodName + ": " + t);
+            return null;
+        }
+    }
+
+    public static CustomMethodUnhooker findAndHookMethodWithId(Class<?> clazz, String methodName, String id, Object... parameterTypesAndCallback) {
         boolean recording = HookInstaller.isRecording();
         Class<?>[] paramTypes = extractParameterTypes(parameterTypesAndCallback);
         try {
-            CustomMethodUnhooker unhooker = XposedHelpers.findAndHookMethod(clazz, methodName, parameterTypesAndCallback);
+            CustomMethodUnhooker unhooker = XposedHelpers.findAndHookMethodWithId(clazz, methodName, id, parameterTypesAndCallback);
             if (unhooker != null && recording) {
                 HookInstaller.recordInstall(clazz.getName(), methodName, HookOperation.EXACT_METHOD, Arrays.asList(paramTypes), 1);
             } else if (recording) {
@@ -673,8 +687,7 @@ public class ModuleHelper {
         PENDING_REGISTER,
         ACTIVE,
         STALE,
-        RELEASED,
-        REGISTER_FAILED
+        RELEASED
     }
 
     private static class ReceiverRegistration {
@@ -720,7 +733,7 @@ public class ModuleHelper {
                 registrationContext.registerReceiver(receiver, filter, flags);
             } catch (Throwable t) {
                 throwIfFatal(t);
-                newRegistration.state = RegistrationState.REGISTER_FAILED;
+                rollbackReceiver(newRegistration);
                 log(key, t);
                 return false;
             }
@@ -801,12 +814,19 @@ public class ModuleHelper {
                     registrationContext.registerReceiver(receiver, filter, flags);
                 } catch (Throwable t) {
                     throwIfFatal(t);
-                    newRegistration.state = RegistrationState.REGISTER_FAILED;
+                    rollbackReceiver(newRegistration);
                     log(key, t);
+                    if (bucket.registrations.isEmpty()) ownedReceivers.remove(key, bucket);
                     return false;
                 }
 
                 newRegistration.state = RegistrationState.ACTIVE;
+                // Framework calls may re-enter unregisterOwnedReceiver on this
+                // thread and detach the bucket while its monitor is held.
+                if (ownedReceivers.get(key) != bucket) {
+                    releaseReceiver(newRegistration);
+                    return false;
+                }
 
                 // Replace stale, dead-owner or same-owner registrations. Keep different owners.
                 for (int i = bucket.registrations.size() - 1; i >= 0; i--) {
@@ -818,12 +838,7 @@ public class ModuleHelper {
                 }
                 bucket.registrations.add(newRegistration);
 
-                if (bucket.registrations.contains(newRegistration)) {
-                    return true;
-                }
-
-                releaseReceiver(newRegistration);
-                return false;
+                return true;
             }
         }
     }
@@ -862,6 +877,13 @@ public class ModuleHelper {
         if (previous != null) guarded("ModuleHelper.clearRegistration:" + key, previous);
     }
 
+    private static void rollbackReceiver(ReceiverRegistration registration) {
+        // Ordinary registration failure may occur after framework side effects.
+        // Failed cleanup stays in the same bounded stale queue as replacement.
+        registration.state = RegistrationState.ACTIVE;
+        releaseReceiver(registration);
+    }
+
     private static boolean tryRelease(ReceiverRegistration registration) {
         if (registration == null) return true;
         synchronized (registration) {
@@ -869,13 +891,16 @@ public class ModuleHelper {
                 case RELEASED:
                     return true;
                 case PENDING_REGISTER:
-                case REGISTER_FAILED:
                     registration.state = RegistrationState.RELEASED;
                     return true;
                 case ACTIVE:
                 case STALE:
                     try {
                         registration.context.unregisterReceiver(registration.receiver);
+                        registration.state = RegistrationState.RELEASED;
+                        return true;
+                    } catch (IllegalArgumentException t) {
+                        throwIfFatal(t);
                         registration.state = RegistrationState.RELEASED;
                         return true;
                     } catch (Throwable t) {
@@ -893,7 +918,6 @@ public class ModuleHelper {
         synchronized (registration) {
             switch (registration.state) {
                 case RELEASED:
-                case REGISTER_FAILED:
                 case STALE:
                     return;
                 case PENDING_REGISTER:
@@ -902,6 +926,9 @@ public class ModuleHelper {
                 case ACTIVE:
                     try {
                         registration.context.unregisterReceiver(registration.receiver);
+                        registration.state = RegistrationState.RELEASED;
+                    } catch (IllegalArgumentException t) {
+                        throwIfFatal(t);
                         registration.state = RegistrationState.RELEASED;
                     } catch (Throwable t) {
                         throwIfFatal(t);

@@ -110,6 +110,21 @@ object PreferenceLoadRegistry {
         return rules.any { it.predicate.shouldLoad(prefs, packageName) }
     }
 
+    /** Settings-side scope requests use the same keys and gates as process loading. */
+    @JvmStatic
+    fun selectedScopePackages(prefs: SharedPreferences): Set<String> {
+        val packages = LinkedHashSet<String>()
+        for (rule in rules) {
+            for (key in rule.preferenceKeys) {
+                if (!key.endsWith("_apps")) continue
+                for (pkg in prefs.getStringSet(key, emptySet()).orEmpty()) {
+                    if (pkg.isNotBlank() && rule.predicate.shouldLoad(prefs, pkg)) packages.add(pkg)
+                }
+            }
+        }
+        return packages
+    }
+
     /**
      * Preserves the exact Java `||` short-circuit and exception behaviour of
      * the original [tv.withaibuild.customiuizer.MainModule.isVolumeMediaEnabled].

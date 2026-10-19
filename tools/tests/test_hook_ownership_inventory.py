@@ -95,5 +95,58 @@ class HookOwnershipInventoryCompletenessTest(unittest.TestCase):
         )
 
 
+class HookRegexDecouplingTest(unittest.TestCase):
+    """Contract: canonical HOOK_RE and OWNERSHIP_REPORT_HOOK_RE are independent."""
+
+    def test_canonical_hook_re_covers_all_helper_forms(self) -> None:
+        import sys
+        sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+        from audit_hook_ownership import HOOK_RE
+
+        must_match = [
+            "ModuleHelper.findAndHookMethod(",
+            "XposedHelpers.findAndHookMethod(",
+            "XposedBridge.hookAllMethods(",
+            "HookerClassHelper.findAndHookMethod(",
+            "findAndHookMethod(",
+            "hookAllMethods(",
+            "hookAllConstructors(",
+        ]
+        for sample in must_match:
+            self.assertIsNotNone(
+                HOOK_RE.search(sample),
+                f"canonical HOOK_RE must match: {sample}",
+            )
+
+    def test_ownership_report_regex_is_narrower(self) -> None:
+        import sys
+        sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+        from audit_hook_ownership import HOOK_RE, OWNERSHIP_REPORT_HOOK_RE
+
+        must_not_match = [
+            "XposedHelpers.findAndHookMethod(",
+            "XposedBridge.hookAllMethods(",
+            "HookerClassHelper.findAndHookMethod(",
+            "findAndHookMethod(",
+        ]
+        for sample in must_not_match:
+            self.assertIsNone(
+                OWNERSHIP_REPORT_HOOK_RE.search(sample),
+                f"OWNERSHIP_REPORT_HOOK_RE must NOT match: {sample}",
+            )
+
+        must_match = [
+            "ModuleHelper.findAndHookMethod(",
+            "ModuleHelper.hookAllConstructors(",
+            "ModuleHelper.hookAllMethods(",
+        ]
+        for sample in must_match:
+            self.assertIsNotNone(
+                OWNERSHIP_REPORT_HOOK_RE.search(sample),
+                f"OWNERSHIP_REPORT_HOOK_RE must match: {sample}",
+            )
+
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -73,13 +73,12 @@ class CatalogBatch9And10ContractTest {
         )
         assertTrue("skipAppLock has no optional targets", optionalIds(skipAppLock).isEmpty())
 
-        // NoCallInterruptionHook installs 3 hard hooks.
+        // Two hooks; callingPackage is resolved before either hook is installed.
         val noCallInterruption = contractFor("noCallInterruption")
         assertEquals(
             setOf(
                 "AudioService.requestAudioFocus",
-                "TelephonyRegistry.notifyCallState",
-                "TelephonyRegistry.notifyCallStateForPhoneId"
+                "TelephonyRegistry.Record.matchTelephonyCallbackEvent"
             ),
             requiredIds(noCallInterruption)
         )

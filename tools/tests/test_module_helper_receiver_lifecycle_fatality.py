@@ -15,20 +15,7 @@ RECEIVER_METHODS = (
     "private static void releaseReceiver(ReceiverRegistration registration)",
 )
 
-HOOK_INSTALL_METHODS = [
-    "public static CustomMethodUnhooker hookMethod(Method method, MethodHook callback)",
-    "public static CustomMethodUnhooker findAndHookMethod(String className, ClassLoader classLoader, String methodName, Object... parameterTypesAndCallback)",
-    "public static CustomMethodUnhooker findAndHookMethod(Class<?> clazz, String methodName, Object... parameterTypesAndCallback)",
-    "public static boolean findAndHookMethodSilently(String className, ClassLoader classLoader, String methodName, Object... parameterTypesAndCallback)",
-    "public static boolean findAndHookMethodSilently(Class<?> clazz, String methodName, Object... parameterTypesAndCallback)",
-    "public static CustomMethodUnhooker findAndHookConstructor(String className, ClassLoader classLoader, Object... parameterTypesAndCallback)",
-    "public static void hookAllConstructors(String className, ClassLoader classLoader, MethodHook callback)",
-    "public static void hookAllConstructors(Class<?> hookClass, MethodHook callback)",
-    "public static void hookAllMethods(String className, ClassLoader classLoader, String methodName, MethodHook callback)",
-    "public static void hookAllMethods(Class<?> hookClass, String methodName, MethodHook callback)",
-    "public static boolean hookAllMethodsSilently(String className, ClassLoader classLoader, String methodName, MethodHook callback)",
-    "public static boolean hookAllMethodsSilently(Class<?> hookClass, String methodName, MethodHook callback)",
-]
+from tools.tests.module_helper_contracts import HOOK_INSTALL_METHODS as HOOK_INSTALL_METHODS
 
 REFLECTION_FALLBACK_METHODS = (
     "public static Object getStaticObjectFieldSilently(Class <?> clazz, String fieldName)",
@@ -138,7 +125,7 @@ class ModuleHelperReceiverLifecycleFatalityContractTest(unittest.TestCase):
                     try_body,
                 )
 
-    def test_both_register_catches_set_register_failed(self):
+    def test_both_register_catches_roll_back_partial_registration(self):
         for sig in RECEIVER_METHODS[:2]:
             with self.subTest(sig=sig):
                 body = self._extract_method_body(sig)
@@ -146,7 +133,7 @@ class ModuleHelperReceiverLifecycleFatalityContractTest(unittest.TestCase):
                 catch = self._extract_catch_body(body)
                 self.assertIsNotNone(catch)
                 self.assertIn(
-                    "newRegistration.state = RegistrationState.REGISTER_FAILED",
+                    "rollbackReceiver(newRegistration);",
                     catch,
                 )
 
@@ -211,7 +198,7 @@ class ModuleHelperReceiverLifecycleFatalityContractTest(unittest.TestCase):
         self.assertIn("releaseReceiver(r)", body)
         self.assertIn("bucket.registrations.remove(i)", body)
         self.assertIn("bucket.registrations.add(newRegistration)", body)
-        self.assertIn("bucket.registrations.contains(newRegistration)", body)
+        self.assertIn("ownedReceivers.get(key) != bucket", body)
 
     # ------------------------------------------------------------------
     # 16-24. Release behavior
@@ -343,7 +330,7 @@ class ModuleHelperReceiverLifecycleFatalityContractTest(unittest.TestCase):
             self.text,
         )
 
-    def test_registration_state_enum_unchanged(self):
+    def test_registration_state_tracks_release_outcome(self):
         match = re.search(
             r"private enum RegistrationState \{([^}]+)\}",
             self.text,
@@ -354,7 +341,7 @@ class ModuleHelperReceiverLifecycleFatalityContractTest(unittest.TestCase):
         self.assertIn("ACTIVE", body)
         self.assertIn("STALE", body)
         self.assertIn("RELEASED", body)
-        self.assertIn("REGISTER_FAILED", body)
+        self.assertNotIn("REGISTER_FAILED", body)
 
     # ------------------------------------------------------------------
     # 30-33. Scope protection

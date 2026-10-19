@@ -38,6 +38,9 @@ class ModuleHelperReceiverTest {
         val unregisteredReceivers = ArrayList<BroadcastReceiver>()
 
         var registerDelayMs = 0L
+        var failAfterRegister = false
+        var afterRegister: (() -> Unit)? = null
+        val activeReceivers = HashSet<BroadcastReceiver>()
         var failNextRegister = false
         var failNextUnregister = false
         var oomNextRegister = false
@@ -64,7 +67,15 @@ class ModuleHelperReceiverTest {
             if (registerDelayMs > 0L) {
                 Thread.sleep(registerDelayMs)
             }
-            if (receiver != null) registeredReceivers.add("" to receiver)
+            if (receiver != null) {
+                registeredReceivers.add("" to receiver)
+                activeReceivers.add(receiver)
+            }
+            if (failAfterRegister) {
+                failAfterRegister = false
+                throw IllegalStateException("registered then failed")
+            }
+            afterRegister?.invoke()
             return Intent("stub")
         }
 
@@ -73,7 +84,10 @@ class ModuleHelperReceiverTest {
                 failNextUnregister = false
                 throw IllegalStateException("simulated unregister failure")
             }
-            if (receiver != null) unregisteredReceivers.add(receiver)
+            if (receiver != null) {
+                if (!activeReceivers.remove(receiver)) throw IllegalArgumentException("not registered")
+                unregisteredReceivers.add(receiver)
+            }
         }
     }
 
@@ -466,5 +480,38 @@ class ModuleHelperReceiverTest {
         if (!map.containsKey(key)) return false
         val deque = map[key] as? Collection<*> ?: return false
         return !deque.isEmpty()
+    }
+
+    @Test
+    fun moduleReceiver_partialRegistrationIsRolledBackAndOldReceiverSurvives() {
+        val context = TrackableContext()
+        val old = StubReceiver()
+        val replacement = StubReceiver()
+        assertTrue(ModuleHelper.registerModuleReceiver(context, "partial", old, intentFilter("a"), Context.RECEIVER_NOT_EXPORTED))
+        context.failAfterRegister = true
+        assertFalse(ModuleHelper.registerModuleReceiver(context, "partial", replacement, intentFilter("a"), Context.RECEIVER_NOT_EXPORTED))
+        assertEquals(setOf(old), context.activeReceivers)
+        assertTrue(context.unregisteredReceivers.contains(replacement))
+        ModuleHelper.unregisterModuleReceiver("partial")
+        assertTrue(context.activeReceivers.isEmpty())
+    }
+
+    @Test
+    fun ownedReceiver_partialRegistrationIsRolledBack() {
+        val context = TrackableContext()
+        context.failAfterRegister = true
+        assertFalse(ModuleHelper.registerOwnedReceiver(context, Any(), "partial-owned", StubReceiver(), intentFilter("a"), Context.RECEIVER_NOT_EXPORTED))
+        assertTrue(context.activeReceivers.isEmpty())
+    }
+
+    @Test
+    fun ownedReceiver_reentrantUnregisterCannotLeaveAnUntrackedReceiver() {
+        val context = TrackableContext()
+        val owner = Any()
+        val key = "reentrant"
+        assertTrue(ModuleHelper.registerOwnedReceiver(context, owner, key, StubReceiver(), intentFilter("a"), Context.RECEIVER_NOT_EXPORTED))
+        context.afterRegister = { ModuleHelper.unregisterOwnedReceiver(key, owner) }
+        assertFalse(ModuleHelper.registerOwnedReceiver(context, owner, key, StubReceiver(), intentFilter("a"), Context.RECEIVER_NOT_EXPORTED))
+        assertTrue(context.activeReceivers.isEmpty())
     }
 }

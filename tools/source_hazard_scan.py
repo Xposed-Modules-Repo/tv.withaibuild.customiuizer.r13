@@ -73,16 +73,23 @@ RULES: list[tuple[str, re.Pattern[str], str]] = [
         re.compile(
             r"(?m)^[ \t]*(?:public|private|protected|internal)?[ \t]*(?:static[ \t]+|@JvmField[ \t]+)?"
             r"(?:"
-            r"(?:var|val)[ \t]+[A-Za-z0-9_]+[ \t]*:[ \t]*\b(?:Context|Activity|View|Fragment|Window|Drawable)\??[ \t]*(?:=|;)"
+            r"(?:var|val)[ \t]+[A-Za-z0-9_]+[ \t]*:[ \t]*\b(?:(?:android\.content\.)?Context|(?:android\.app\.)?Activity|(?:android\.view\.)?View|(?:android\.app\.|androidx\.fragment\.app\.)?Fragment|(?:android\.view\.)?Window|(?:android\.graphics\.drawable\.)?Drawable)\??[ \t]*(?:=|;)"
             r"|"
-            r"\b(?:Context|Activity|View|Fragment|Window|Drawable)(?:<[^>\n]*>)?[ \t]+[A-Za-z0-9_]+[ \t]*(?:=|;)"
+            r"\b(?:(?:android\.content\.)?Context|(?:android\.app\.)?Activity|(?:android\.view\.)?View|(?:android\.app\.|androidx\.fragment\.app\.)?Fragment|(?:android\.view\.)?Window|(?:android\.graphics\.drawable\.)?Drawable)(?:<[^>\n]*>)?[ \t]+[A-Za-z0-9_]+[ \t]*(?:=|;)"
             r")"
         ),
         "potential strong Android owner; require scoped owner or WeakReference",
     ),
     (
         "EAGER_HANDLER_THREAD",
-        re.compile(r"HandlerThread\s*\([^)]*\)[\s\S]{0,160}?\.start\s*\("),
+        re.compile(
+            r"HandlerThread\s*\([^)]*\)"
+            r"(?:"
+            r"[\s\S]{0,160}?\.start\s*\("
+            r"|"
+            r"\s*\.(?:apply|also|run|let)\s*\{[^}]{0,120}?start\s*\("
+            r")"
+        ),
         "eager HandlerThread start; worker must be lazy and bounded",
     ),
     (
@@ -231,6 +238,10 @@ def scan_file(path: Path, repo_root: Path) -> list[Finding]:
             if f"BRUTAL_ALLOW:{rule}" in source_line:
                 continue
             if rule == "STATIC_STRONG_ANDROID_OWNER" and not _is_static_owner_scope(text, line, source_line):
+                continue
+            # Explicit lifecycle methods are not class initialization. Reuse the
+            # existing scope model rather than flagging cold initContext/start calls.
+            if rule == "EAGER_HANDLER_THREAD" and _scope_state_for(text).get(line, (False, False, False, False))[0]:
                 continue
             snippet = re.sub(r"\s+", " ", match.group(0))[:220]
             findings.append(Finding(rule, rel, line, snippet))

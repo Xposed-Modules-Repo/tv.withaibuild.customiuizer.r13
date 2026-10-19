@@ -101,7 +101,7 @@ class ArchitectureInvariantTest(unittest.TestCase):
         text = (REPO / "app" / "src" / "main" / "java" / "tv" / "withaibuild" / "customiuizer" / "mods" / "catalog" / "FeatureCatalog.kt").read_text(encoding="utf-8")
         self.assertIn("private val registrySpecsInternal", text)
         self.assertIn("private val adaptedSpecsInternal", text)
-        delimiter = "private val adaptedSpecsInternal by lazy(LazyThreadSafetyMode.NONE) { listOf("
+        delimiter = "private val adaptedSpecsInternal by lazy(LazyThreadSafetyMode.SYNCHRONIZED) { listOf("
         self.assertIn(delimiter, text, "registry and adapted spec lists must be split")
         registry_text, adapted_text = text.split(delimiter, 1)
         registry_ids = re.findall(r'id = "([^"]+)"', registry_text)

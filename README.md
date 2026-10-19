@@ -1,13 +1,19 @@
-# CustoMIUIzer A13
+# 米客 A13｜CustoMIUIzer A13
 
 简体中文 | [English](README_EN.md)
 
 CustoMIUIzer A13 是面向 **MIUI 14 / Android 13** 的系统界面与交互定制模块，并为 **HyperOS 1 / Android 13** 提供基于能力探测的兼容路径。项目使用独立包名、版本线和现代 libxposed API。
 
-- 当前版本：`r13.12.0`（versionCode `138`）
+> **r13.13.0 已更换签名，不能直接覆盖旧版。** 请先导出设置备份，卸载后安装，再恢复备份并重新启用模块。详见 [兼容说明](COMPATIBILITY.md#签名与升级)。
+
+> **维护状态**
+>
+> 持续维护，优先修复 Android 13 目标上的正确性、兼容性与稳定性问题。
+
+- 当前版本：`r13.13.0`（versionCode `141`）
 - 应用 ID：`tv.withaibuild.customiuizer.r13`
-- 源码仓库：<https://github.com/tomthenpc/customiuizer-a13>
-- 用户下载：<https://github.com/Xposed-Modules-Repo/tv.withaibuild.customiuizer.r13/releases>
+- 源码仓库：<https://github.com/thetvplus/customiuizer-a13>
+- 用户下载：<https://github.com/thetvplus/customiuizer-a13/releases>
 - 实装框架：LSPosed / Vector
 
 ## 核心功能
@@ -26,11 +32,11 @@ CustoMIUIzer A13 是面向 **MIUI 14 / Android 13** 的系统界面与交互定�
 | SDK | minSdk 33 / targetSdk 34 |
 | ABI | `arm64-v8a` |
 | Xposed 框架 | LSPosed / Vector |
-| 模块元数据 | `minApiVersion=101`、`targetApiVersion=102`、`staticScope=false` |
+| 模块元数据 | `minApiVersion=102`、`targetApiVersion=102`、`staticScope=true` |
 
-不支持 Android 14 及以上版本，也不建议与上游版或其他 CustoMIUIzer 派生模块同时启用。
+需要提供 libxposed API 102 的框架。不支持 Android 14 及以上版本，也不建议与上游版或其他 CustoMIUIzer 派生模块同时启用。
 
-已知实装基线：Redmi Note 11T Pro（`xaga`）、MIUI `V14.0.10.0.TLOINXM`。
+历史实装基线：Redmi Note 11T Pro（`xaga`）、MIUI `V14.0.10.0.TLOINXM`；不代表 `r13.13.0` 已完成实机验收。
 
 ## 运行架构
 
@@ -43,7 +49,7 @@ CustoMIUIzer A13 是面向 **MIUI 14 / Android 13** 的系统界面与交互定�
 
 本版本变化见 [CHANGELOG.md](CHANGELOG.md)。工程规则、架构与兼容文档见 [AGENTS.md](AGENTS.md)、[ARCHITECTURE.md](ARCHITECTURE.md)、[COMPATIBILITY.md](COMPATIBILITY.md) 与 [docs/A13_PARITY.md](docs/A13_PARITY.md)。
 
-`r13.12.0` 修复手势/自定义动作保存后回到“无动作”的问题，并补齐桌面手势页的重启入口；同时纳入 USB 默认用途、安装器净化、文件夹模糊、备份格式和若干状态栏/桌面视觉能力。详见 [CHANGELOG.md](CHANGELOG.md)。
+`r13.13.0` 修复来电过滤与通知设置，收敛安装和 Service 生命周期，统一 API 102 与工程工具链。完整变化见 [CHANGELOG.md](CHANGELOG.md)。
 
 ## 构建与验证
 
@@ -51,12 +57,15 @@ CustoMIUIzer A13 是面向 **MIUI 14 / Android 13** 的系统界面与交互定�
 python tools/verify.py full
 ```
 
+工程工具链：AGP 9.4.1、Gradle 9.8.1、Kotlin 2.4.21（AGP 内置模式）、JDK 25、compileSdk 37；minSdk 33 / targetSdk 34 保持不变。见 [构建说明](docs/ENGINEERING_UPGRADE.md)。
+
+
 ## 支持与联系
 
 如果这个项目对你有帮助，可以通过 [PayPal](https://paypal.me/Jinjitv) 支持后续开发与维护。
 
-- 源码仓库：<https://github.com/tomthenpc/customiuizer-a13>
-- 用户下载：<https://github.com/Xposed-Modules-Repo/tv.withaibuild.customiuizer.r13/releases>
+- 源码仓库：<https://github.com/thetvplus/customiuizer-a13>
+- 用户下载：<https://github.com/thetvplus/customiuizer-a13/releases>
 
 ## 开发说明
 

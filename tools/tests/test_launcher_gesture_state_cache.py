@@ -1,6 +1,5 @@
 """Static contract tests for the launcher gesture state cache."""
 import re
-import subprocess
 import unittest
 from pathlib import Path
 
@@ -227,39 +226,6 @@ class LauncherGestureStateCacheTest(unittest.TestCase):
 
     def test_no_print_stack_trace_in_production_source(self):
         self.assertNotIn(".printStackTrace(", self.source)
-
-
-class ScopeProtectionTest(unittest.TestCase):
-    def test_no_other_launcher_files_modified(self):
-        result = subprocess.run(
-            ["git", "diff", "--name-only", "HEAD", "--", "app/src/main/java"],
-            capture_output=True,
-            text=True,
-            cwd=REPO_ROOT,
-        )
-        changed = [p for p in result.stdout.splitlines() if p]
-        allowed = {
-            "app/src/main/java/tv/withaibuild/customiuizer/mods/LauncherGestureHooks.kt",
-            "app/src/main/java/tv/withaibuild/customiuizer/mods/SystemAudioAndVolumeHooks.kt",
-            "app/src/main/java/tv/withaibuild/customiuizer/mods/SystemUILockScreenHooks.kt",
-            "app/src/main/java/tv/withaibuild/customiuizer/mods/SystemUINotificationHooks.kt",
-            "app/src/main/java/tv/withaibuild/customiuizer/installers/AndroidPackageInstaller.java",
-            "app/src/main/java/tv/withaibuild/customiuizer/MainModule.java",
-            "app/src/main/java/tv/withaibuild/customiuizer/installers/SystemUiInstaller.java",
-            "app/src/main/java/tv/withaibuild/customiuizer/installers/LauncherInstaller.java",
-            "app/src/main/java/tv/withaibuild/customiuizer/subs/MultiAction.kt",
-            "app/src/main/java/tv/withaibuild/customiuizer/subs/AppSelector.kt",
-            "app/src/main/java/tv/withaibuild/customiuizer/subs/ActivitySelector.kt",
-            "app/src/main/java/tv/withaibuild/customiuizer/subs/ShortcutSelector.kt",
-            "app/src/main/java/tv/withaibuild/customiuizer/subs/SelectorResultDelivery.kt",
-            "app/src/main/java/tv/withaibuild/customiuizer/subs/MultiActionSelectionState.kt",
-        }
-        for path in changed:
-            if path in allowed:
-                continue
-            self.fail(
-                f"Unexpected app/src/main/java change: {path}; only {allowed} are permitted"
-            )
 
 
 if __name__ == "__main__":

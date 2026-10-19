@@ -339,7 +339,7 @@ def check_no_redundant_arg_marshalling(path: Path, text: str) -> list[Finding]:
 
 
 def check_no_legacy_xposed(path: Path, text: str) -> list[Finding]:
-    """The module runs on libxposed API 101/102 only."""
+    """The module runs on native libxposed API 102 only."""
     findings = []
     for match in re.finditer(r"de\.robv\.android\.xposed", text):
         findings.append(

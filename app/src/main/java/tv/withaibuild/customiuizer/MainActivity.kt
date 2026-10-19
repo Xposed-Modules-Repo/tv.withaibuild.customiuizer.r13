@@ -1,8 +1,6 @@
 package tv.withaibuild.customiuizer
 
 import android.Manifest
-import android.annotation.SuppressLint
-import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.KeyEvent
@@ -12,50 +10,15 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
-import io.github.libxposed.service.XposedServiceHelper
-import tv.withaibuild.customiuizer.mods.GlobalActions
 import tv.withaibuild.customiuizer.utils.AppHelper
 import tv.withaibuild.customiuizer.utils.Helpers
-import tv.withaibuild.customiuizer.utils.SettingsDiagnostics
 
 class MainActivity : AppCompatActivity() {
 
     private var mainFrag: MainFragment? = null
-    private var prefsChanged: android.content.SharedPreferences.OnSharedPreferenceChangeListener? = null
-
-    override fun attachBaseContext(base: Context) {
-        super.attachBaseContext(base)
-    }
-
-    @SuppressLint("ApplySharedPref")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        val ignoreKeys = hashSetOf(
-            "pref_key_miuizer_locale",
-            "pref_key_miuizer_locale_applied",
-            "pref_key_miuizer_launchericon",
-            "pref_key_miuizer_synced_from_lsposed"
-        )
-        AppHelper.setMirrorIgnoreKeys(ignoreKeys)
-
-        if (AppHelper.remotePrefs == null) {
-            XposedServiceHelper.registerListener(object : XposedServiceHelper.OnServiceListener {
-                override fun onServiceBind(service: io.github.libxposed.service.XposedService) {
-                    AppHelper.moduleConnectionObserved = true
-                    AppHelper.moduleActive = true
-                    AppHelper.remotePrefs = service.getRemotePreferences(AppHelper.prefsName + "_remote") as io.github.libxposed.service.RemotePreferences
-                    AppHelper.reconcileRemotePreferences(AppHelper.remotePrefs)
-                }
-
-                override fun onServiceDied(service: io.github.libxposed.service.XposedService) {
-                    AppHelper.moduleConnectionObserved = true
-                    AppHelper.moduleActive = false
-                    AppHelper.remotePrefs = null
-                }
-            })
-        }
 
         val myToolbar = findViewById<Toolbar>(R.id.mainActionBar)
         setSupportActionBar(myToolbar)
@@ -71,28 +34,11 @@ class MainActivity : AppCompatActivity() {
                 .commit()
         }
 
-        prefsChanged = android.content.SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
-            val value = if (key == null) null else AppHelper.appPrefs?.all?.get(key)
-            AppHelper.onLocalPreferenceChanged(AppHelper.remotePrefs, key, value)
-        }
-
-        AppHelper.appPrefs?.registerOnSharedPreferenceChangeListener(prefsChanged)
     }
 
     override fun onSaveInstanceState(savedInstanceState: Bundle) {
         mainFrag?.let { supportFragmentManager.putFragment(savedInstanceState, "mainFrag", it) }
         super.onSaveInstanceState(savedInstanceState)
-    }
-
-    @SuppressLint("ApplySharedPref")
-    override fun onDestroy() {
-        try {
-            prefsChanged?.let { AppHelper.appPrefs?.unregisterOnSharedPreferenceChangeListener(it) }
-        } catch (t: Throwable) {
-            if (t is OutOfMemoryError || t is ThreadDeath || t is VirtualMachineError) throw t
-            SettingsDiagnostics.failure("MainActivity.unregisterPreferenceListener", t)
-        }
-        super.onDestroy()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

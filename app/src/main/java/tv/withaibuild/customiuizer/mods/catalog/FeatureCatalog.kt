@@ -56,7 +56,7 @@ object FeatureCatalog {
         return CanaryContracts.statusBarClockTweakForInstall(statusBar, controlCenter, hideDate)
     }
 
-    private val registrySpecsInternal by lazy(LazyThreadSafetyMode.NONE) { listOf(
+    private val registrySpecsInternal by lazy(LazyThreadSafetyMode.SYNCHRONIZED) { listOf(
         FeatureSpec(
             compatibilityPolicy = CompatibilityPolicy.CONTRACT_REQUIRED,
             contract = CanaryContracts.packagePermissions,
@@ -77,24 +77,7 @@ object FeatureCatalog {
                 ) {
                     PackagePermissions.hook(runtime.lpparam as SystemServerStartingParam)
                 }
-                when (session.installation) {
-                    InstallOutcome.INSTALLED,
-                    InstallOutcome.DEGRADED,
-                    InstallOutcome.DISPATCHED -> FeatureInstallResult.Installed(
-                        InstallSummary(
-                            requiredInstalled = session.requiredInstalled,
-                            requiredTotal = session.requiredTotal,
-                            optionalInstalled = session.optionalInstalled,
-                            optionalTotal = session.optionalTotal,
-                            fallbackUsed = session.fallbackUsed,
-                            installation = session.installation ?: InstallOutcome.FAILED,
-                            reasonCode = session.reasonCode
-                        )
-                    )
-                    else -> FeatureInstallResult.FailedTransient(
-                        session.detail ?: "packagePermissions session failed"
-                    )
-                }
+                session.toFeatureInstallResult("packagePermissions session failed")
             },
             activationRestartTarget = RestartTarget.REBOOT,
             configReloadMode = ConfigReloadMode.NONE
@@ -145,24 +128,7 @@ object FeatureCatalog {
                         runtime.lpparam as PackageReadyParam
                     )
                 }
-                when (session.installation) {
-                    InstallOutcome.INSTALLED,
-                    InstallOutcome.DEGRADED,
-                    InstallOutcome.DISPATCHED -> FeatureInstallResult.Installed(
-                        InstallSummary(
-                            requiredInstalled = session.requiredInstalled,
-                            requiredTotal = session.requiredTotal,
-                            optionalInstalled = session.optionalInstalled,
-                            optionalTotal = session.optionalTotal,
-                            fallbackUsed = session.fallbackUsed,
-                            installation = session.installation ?: InstallOutcome.FAILED,
-                            reasonCode = session.reasonCode
-                        )
-                    )
-                    else -> FeatureInstallResult.FailedTransient(
-                        session.detail ?: "statusBarClockTweak session failed"
-                    )
-                }
+                session.toFeatureInstallResult("statusBarClockTweak session failed")
             },
             activationRestartTarget = RestartTarget.SYSTEMUI_RESTART,
             configReloadMode = ConfigReloadMode.PARTIAL
@@ -204,24 +170,7 @@ object FeatureCatalog {
                             variant
                         )
                     }
-                    when (session.installation) {
-                        InstallOutcome.INSTALLED,
-                        InstallOutcome.DEGRADED,
-                        InstallOutcome.DISPATCHED -> FeatureInstallResult.Installed(
-                            InstallSummary(
-                                requiredInstalled = session.requiredInstalled,
-                                requiredTotal = session.requiredTotal,
-                                optionalInstalled = session.optionalInstalled,
-                                optionalTotal = session.optionalTotal,
-                                fallbackUsed = session.fallbackUsed,
-                                installation = session.installation ?: InstallOutcome.FAILED,
-                                reasonCode = session.reasonCode
-                            )
-                        )
-                        else -> FeatureInstallResult.FailedTransient(
-                            session.detail ?: "autoBrightnessRange session failed"
-                        )
-                    }
+                    session.toFeatureInstallResult("autoBrightnessRange session failed")
                 }
             },
             activationRestartTarget = RestartTarget.REBOOT,
@@ -251,24 +200,7 @@ object FeatureCatalog {
                         runtime.lpparam as SystemServerStartingParam
                     )
                 }
-                when (session.installation) {
-                    InstallOutcome.INSTALLED,
-                    InstallOutcome.DEGRADED,
-                    InstallOutcome.DISPATCHED -> FeatureInstallResult.Installed(
-                        InstallSummary(
-                            requiredInstalled = session.requiredInstalled,
-                            requiredTotal = session.requiredTotal,
-                            optionalInstalled = session.optionalInstalled,
-                            optionalTotal = session.optionalTotal,
-                            fallbackUsed = session.fallbackUsed,
-                            installation = session.installation ?: InstallOutcome.FAILED,
-                            reasonCode = session.reasonCode
-                        )
-                    )
-                    else -> FeatureInstallResult.FailedTransient(
-                        session.detail ?: "muffledVibration session failed"
-                    )
-                }
+                session.toFeatureInstallResult("muffledVibration session failed")
             },
             activationRestartTarget = RestartTarget.REBOOT,
             configReloadMode = ConfigReloadMode.NONE
@@ -298,24 +230,7 @@ object FeatureCatalog {
                         runtime.lpparam as PackageReadyParam
                     )
                 }
-                when (session.installation) {
-                    InstallOutcome.INSTALLED,
-                    InstallOutcome.DEGRADED,
-                    InstallOutcome.DISPATCHED -> FeatureInstallResult.Installed(
-                        InstallSummary(
-                            requiredInstalled = session.requiredInstalled,
-                            requiredTotal = session.requiredTotal,
-                            optionalInstalled = session.optionalInstalled,
-                            optionalTotal = session.optionalTotal,
-                            fallbackUsed = session.fallbackUsed,
-                            installation = session.installation ?: InstallOutcome.FAILED,
-                            reasonCode = session.reasonCode
-                        )
-                    )
-                    else -> FeatureInstallResult.FailedTransient(
-                        session.detail ?: "noMoreIcon session failed"
-                    )
-                }
+                session.toFeatureInstallResult("noMoreIcon session failed")
             },
             activationRestartTarget = RestartTarget.SYSTEMUI_RESTART,
             configReloadMode = ConfigReloadMode.NONE
@@ -344,24 +259,7 @@ object FeatureCatalog {
                         runtime.lpparam as PackageReadyParam
                     )
                 }
-                when (session.installation) {
-                    InstallOutcome.INSTALLED,
-                    InstallOutcome.DEGRADED,
-                    InstallOutcome.DISPATCHED -> FeatureInstallResult.Installed(
-                        InstallSummary(
-                            requiredInstalled = session.requiredInstalled,
-                            requiredTotal = session.requiredTotal,
-                            optionalInstalled = session.optionalInstalled,
-                            optionalTotal = session.optionalTotal,
-                            fallbackUsed = session.fallbackUsed,
-                            installation = session.installation ?: InstallOutcome.FAILED,
-                            reasonCode = session.reasonCode
-                        )
-                    )
-                    else -> FeatureInstallResult.FailedTransient(
-                        session.detail ?: "batteryIndicator session failed"
-                    )
-                }
+                session.toFeatureInstallResult("batteryIndicator session failed")
             },
             activationRestartTarget = RestartTarget.SYSTEMUI_RESTART,
             configReloadMode = ConfigReloadMode.NONE
@@ -391,24 +289,7 @@ object FeatureCatalog {
                         runtime.lpparam as PackageReadyParam
                     )
                 }
-                when (session.installation) {
-                    InstallOutcome.INSTALLED,
-                    InstallOutcome.DEGRADED,
-                    InstallOutcome.DISPATCHED -> FeatureInstallResult.Installed(
-                        InstallSummary(
-                            requiredInstalled = session.requiredInstalled,
-                            requiredTotal = session.requiredTotal,
-                            optionalInstalled = session.optionalInstalled,
-                            optionalTotal = session.optionalTotal,
-                            fallbackUsed = session.fallbackUsed,
-                            installation = session.installation ?: InstallOutcome.FAILED,
-                            reasonCode = session.reasonCode
-                        )
-                    )
-                    else -> FeatureInstallResult.FailedTransient(
-                        session.detail ?: "noClockHide session failed"
-                    )
-                }
+                session.toFeatureInstallResult("noClockHide session failed")
             },
             activationRestartTarget = RestartTarget.LAUNCHER_RESTART,
             configReloadMode = ConfigReloadMode.NONE
@@ -437,31 +318,14 @@ object FeatureCatalog {
                         runtime.lpparam as PackageReadyParam
                     )
                 }
-                when (session.installation) {
-                    InstallOutcome.INSTALLED,
-                    InstallOutcome.DEGRADED,
-                    InstallOutcome.DISPATCHED -> FeatureInstallResult.Installed(
-                        InstallSummary(
-                            requiredInstalled = session.requiredInstalled,
-                            requiredTotal = session.requiredTotal,
-                            optionalInstalled = session.optionalInstalled,
-                            optionalTotal = session.optionalTotal,
-                            fallbackUsed = session.fallbackUsed,
-                            installation = session.installation ?: InstallOutcome.FAILED,
-                            reasonCode = session.reasonCode
-                        )
-                    )
-                    else -> FeatureInstallResult.FailedTransient(
-                        session.detail ?: "noWidgetOnly session failed"
-                    )
-                }
+                session.toFeatureInstallResult("noWidgetOnly session failed")
             },
             activationRestartTarget = RestartTarget.LAUNCHER_RESTART,
             configReloadMode = ConfigReloadMode.NONE
         )
     ) }
 
-    private val adaptedSpecsInternal by lazy(LazyThreadSafetyMode.NONE) { listOf(
+    private val adaptedSpecsInternal by lazy(LazyThreadSafetyMode.SYNCHRONIZED) { listOf(
         // Catalog expansion batch 1: system_server
         FeatureSpec(
             compatibilityPolicy = CompatibilityPolicy.CONTRACT_REQUIRED,
@@ -2140,25 +2004,23 @@ object FeatureCatalog {
             installer()
         }
 
-        return when (session.installation) {
-            InstallOutcome.INSTALLED,
-            InstallOutcome.DEGRADED,
-            InstallOutcome.DISPATCHED -> FeatureInstallResult.Installed(
-                InstallSummary(
-                    requiredInstalled = session.requiredInstalled,
-                    requiredTotal = session.requiredTotal,
-                    optionalInstalled = session.optionalInstalled,
-                    optionalTotal = session.optionalTotal,
-                    fallbackUsed = session.fallbackUsed,
-                    installation = session.installation ?: InstallOutcome.FAILED,
-                    reasonCode = session.reasonCode
-                )
-            )
-            else -> FeatureInstallResult.FailedTransient(
-                session.detail ?: "$diagnosticId session failed"
-            )
-        }
+        return session.toFeatureInstallResult("$diagnosticId session failed")
     }
+
+    /** A failed session with live hooks is terminal; retrying would duplicate them. */
+    internal fun HookInstallResult.toFeatureInstallResult(failure: String): FeatureInstallResult =
+        when (installation) {
+            InstallOutcome.INSTALLED, InstallOutcome.DEGRADED, InstallOutcome.DISPATCHED ->
+                FeatureInstallResult.Installed(
+                    InstallSummary(requiredInstalled, requiredTotal, optionalInstalled, optionalTotal,
+                        fallbackUsed, installation, reasonCode)
+                )
+            else -> {
+                val reason = detail ?: failure
+                if (records.any { it.installedCount > 0 }) FeatureInstallResult.FailedPermanent(reason)
+                else FeatureInstallResult.FailedTransient(reason)
+            }
+        }
 
     /**
      * Build probe used by tests to prove that [registrySpecs] does not touch the
@@ -2179,11 +2041,11 @@ object FeatureCatalog {
         }
     }
 
-    private val allSpecsInternal by lazy(LazyThreadSafetyMode.NONE) {
+    private val allSpecsInternal by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
         registrySpecsInternal + adaptedSpecsInternal
     }
 
-    private val specByCanonicalIdInternal by lazy(LazyThreadSafetyMode.NONE) {
+    private val specByCanonicalIdInternal by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
         allSpecsInternal.associateBy(FeatureSpec::id)
     }
 

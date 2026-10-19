@@ -429,12 +429,16 @@ public final class XposedHelpers {
      * for details.
      */
     public static CustomMethodUnhooker findAndHookMethod(Class<?> clazz, String methodName, Object... parameterTypesAndCallback) {
+        return findAndHookMethodWithId(clazz, methodName, null, parameterTypesAndCallback);
+    }
+
+    public static CustomMethodUnhooker findAndHookMethodWithId(Class<?> clazz, String methodName, String id, Object... parameterTypesAndCallback) {
         if (parameterTypesAndCallback.length == 0 || !(parameterTypesAndCallback[parameterTypesAndCallback.length - 1] instanceof MethodHook))
             throw new IllegalArgumentException("no callback defined");
 
         MethodHook callback = (MethodHook) parameterTypesAndCallback[parameterTypesAndCallback.length - 1];
         Method m = findMethodExact(clazz, methodName, getParameterClasses(clazz.getClassLoader(), parameterTypesAndCallback));
-        return doHookMethod(m, callback);
+        return installHook(moduleInst.hook(m), callback, id);
     }
 
     /**
@@ -851,18 +855,31 @@ public final class XposedHelpers {
     }
 
     public static CustomMethodUnhooker doHookMethod(Method m, MethodHook hook) {
-        XposedInterface.HookHandle handle = moduleInst.hook(m)
-            .setPriority(hook.mPriority)
-            .setExceptionMode(XposedInterface.ExceptionMode.PASSTHROUGH)
-            .intercept(hook);
-        return handle::unhook;
+        return installHook(moduleInst.hook(m), hook, null);
     }
 
     private static CustomMethodUnhooker doHookConstructor(Constructor<?> m, MethodHook hook) {
-        XposedInterface.HookHandle handle = moduleInst.hook(m)
-            .setPriority(hook.mPriority)
-            .setExceptionMode(XposedInterface.ExceptionMode.PASSTHROUGH)
-            .intercept(hook);
+        return installHook(moduleInst.hook(m), hook, null);
+    }
+
+    public static final String HOOK_ID_APPLICATION_ATTACH = "application.attach";
+    public static final String HOOK_ID_SYSTEMUI_CREATE = "systemui.application.create";
+
+    /** Native API 102 policy for all methods and constructors. Never retry an install. */
+    private static CustomMethodUnhooker installHook(XposedInterface.HookBuilder builder, MethodHook hook, String id) {
+        builder = builder.setPriority(hook.mPriority)
+            .setExceptionMode(XposedInterface.ExceptionMode.PASSTHROUGH);
+        if (id != null) builder = builder.setId(id);
+        XposedInterface.HookHandle handle = builder.intercept(hook);
+        if (id != null) {
+            try {
+                log("API 102 hook ID " + id + (id.equals(handle.getId()) ? " (confirmed)" : " (unconfirmed)"));
+            } catch (Throwable t) {
+                RuntimeFatality.throwIfFatal(t);
+                // Readback is diagnostic; keep the installed handle for its owner.
+                log("API 102 hook ID readback unavailable: " + id);
+            }
+        }
         return handle::unhook;
     }
 

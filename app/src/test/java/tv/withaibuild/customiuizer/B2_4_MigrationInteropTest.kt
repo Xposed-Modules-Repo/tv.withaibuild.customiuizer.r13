@@ -30,10 +30,11 @@ class B2_4_MigrationInteropTest {
     fun `MainActivity preserves lifecycle and menu methods`() {
         val clazz = MainActivity::class.java
 
-        assertNotNull(clazz.getDeclaredMethod("attachBaseContext", Context::class.java))
+        // Application owns the service; Activity inherits its now-empty lifecycle hooks.
+        assertNotNull(inheritedMethod(clazz, "attachBaseContext", Context::class.java))
         assertNotNull(clazz.getDeclaredMethod("onCreate", Bundle::class.java))
         assertNotNull(clazz.getDeclaredMethod("onSaveInstanceState", Bundle::class.java))
-        assertNotNull(clazz.getDeclaredMethod("onDestroy"))
+        assertNotNull(inheritedMethod(clazz, "onDestroy"))
         assertNotNull(clazz.getDeclaredMethod("onOptionsItemSelected", MenuItem::class.java))
         assertNotNull(clazz.getDeclaredMethod("onKeyDown", Int::class.javaPrimitiveType, KeyEvent::class.java))
         assertNotNull(
@@ -44,6 +45,18 @@ class B2_4_MigrationInteropTest {
                 IntArray::class.java
             )
         )
+    }
+
+    private fun inheritedMethod(type: Class<*>, name: String, vararg parameters: Class<*>): java.lang.reflect.Method? {
+        var owner: Class<*>? = type
+        while (owner != null) {
+            try {
+                return owner.getDeclaredMethod(name, *parameters)
+            } catch (_: NoSuchMethodException) {
+                owner = owner.superclass
+            }
+        }
+        return null
     }
 
     @Test

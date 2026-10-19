@@ -98,4 +98,32 @@ class GenericAppInstallerPackageFilterTest {
             GenericAppInstaller.isTargetPackage(foreignApp, guardLpparam)
         )
     }
+
+    @Test
+    fun repeatedMatchingAttachInstallsLegacyHooksOnce() {
+        val fake = tv.withaibuild.customiuizer.utils.FakeXposedInterface
+        val previousPrefs = tv.withaibuild.customiuizer.MainModule.mPrefs
+        val previousModule = tv.withaibuild.customiuizer.mods.utils.XposedHelpers.moduleInst
+        try {
+            fake.reset()
+            tv.withaibuild.customiuizer.mods.utils.XposedHelpers.moduleInst = fake.create()
+            val prefs = tv.withaibuild.customiuizer.utils.PrefMap<String, Any>()
+            prefs["system_nooverscroll"] = true
+            prefs["system_nooverscroll_apps"] = setOf("com.example.app")
+            tv.withaibuild.customiuizer.MainModule.mPrefs = prefs
+            val param = fakePackageReadyParam("com.example.app")
+            GenericAppInstaller.install(param, "com.example.app")
+            val hook = fake.findHook("android.app.Application", "attach")!!
+            val before = fake.recordedHooks.size
+            fake.executeAfter(hook, fakeApplication("com.example.app"))
+            val once = fake.recordedHooks.size
+            org.junit.Assert.assertTrue("first attach must install real legacy hooks", once > before)
+            fake.executeAfter(hook, fakeApplication("com.example.app"))
+            org.junit.Assert.assertEquals(once, fake.recordedHooks.size)
+        } finally {
+            tv.withaibuild.customiuizer.MainModule.mPrefs = previousPrefs
+            tv.withaibuild.customiuizer.mods.utils.XposedHelpers.moduleInst = previousModule
+            fake.reset()
+        }
+    }
 }

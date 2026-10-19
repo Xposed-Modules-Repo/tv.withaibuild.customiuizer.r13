@@ -25,7 +25,6 @@ import android.os.Message
 import android.os.PowerManager
 import android.provider.MediaStore
 import android.provider.Settings
-import android.telephony.PhoneStateListener
 import android.text.SpannableString
 import android.view.Gravity
 import android.widget.FrameLayout
@@ -70,51 +69,45 @@ import java.util.*
 object SystemAudioAndVisualAndMoreHooks {
 
     private const val StatusBarCls = "com.android.systemui.statusbar.phone.CentralSurfacesImpl"
-    private var audioFocusPkg: String? = null
-
-    @Suppress("UNCHECKED_CAST")
-    private fun removeListener(thisObject: Any) {
-        val mRecords = XposedHelpers.getObjectField(thisObject, "mRecords") as? ArrayList<Any> ?: return
-        for (record in mRecords) {
-            val callingPackage = XposedHelpers.getObjectField(record, "callingPackage") as? String ?: continue
-            var events = XposedHelpers.getIntField(record, "events")
-            if ((events and PhoneStateListener.LISTEN_CALL_STATE) == PhoneStateListener.LISTEN_CALL_STATE &&
-                MainModule.mPrefs.getStringSet("system_ignorecalls_apps").contains(callingPackage)) {
-                events = events and PhoneStateListener.LISTEN_CALL_STATE.inv()
-                XposedHelpers.setIntField(record, "events", events)
-            }
-        }
-    }
+    @Volatile private var audioFocusPkg: String? = null
 
     @JvmStatic
     fun NoCallInterruptionHook(lpparam: SystemServerStartingParam) {
+        val recordClass = XposedHelpers.findClass("com.android.server.TelephonyRegistry\$Record", lpparam.classLoader)
+        val callingPackageField = XposedHelpers.findField(recordClass, "callingPackage")
+
+        // API 33 stores event IDs in eventList. Filter dispatch without modifying
+        // the listener's subscriptions, so removing an app from the list restores it.
+        ModuleHelper.findAndHookMethod(recordClass, "matchTelephonyCallbackEvent", Int::class.javaPrimitiveType, object : MethodHook() {
+            override fun before(param: BeforeHookCallback) {
+                val event = param.getArg(0) as? Int ?: return
+                // TelephonyCallback.EVENT_CALL_STATE_CHANGED / EVENT_LEGACY_CALL_STATE_CHANGED.
+                if (event != 6 && event != 36) return
+                if (!MainModule.mPrefs.getBoolean("system_ignorecalls")) return
+                val callingPackage = callingPackageField.get(param.thisObject) as? String ?: return
+                if (MainModule.mPrefs.getStringSet("system_ignorecalls_apps").contains(callingPackage)) {
+                    param.returnAndSkip(false)
+                }
+            }
+        })
+
         ModuleHelper.hookAllMethods("com.android.server.audio.AudioService", lpparam.classLoader, "requestAudioFocus", object : MethodHook() {
             override fun before(param: BeforeHookCallback) {
-                if (param.args.size <= 4) return
-                if ("AudioFocus_For_Phone_Ring_And_Calls" == param.args[4] && audioFocusPkg != null &&
+                if (param.getArgsCount() <= 4) return
+                if (!MainModule.mPrefs.getBoolean("system_ignorecalls")) return
+                if ("AudioFocus_For_Phone_Ring_And_Calls" == param.getArg(4) && audioFocusPkg != null &&
                     MainModule.mPrefs.getStringSet("system_ignorecalls_apps").contains(audioFocusPkg))
                     param.returnAndSkip(1)
             }
 
             override fun after(param: AfterHookCallback) {
-                if (param.args.size <= 5) return
+                if (param.getArgsCount() <= 5) return
                 val res = param.result as? Int ?: return
-                if (res != AudioManager.AUDIOFOCUS_REQUEST_FAILED && "AudioFocus_For_Phone_Ring_And_Calls" != param.args[4])
-                    audioFocusPkg = param.args[5] as? String
+                if (res != AudioManager.AUDIOFOCUS_REQUEST_FAILED && "AudioFocus_For_Phone_Ring_And_Calls" != param.getArg(4))
+                    audioFocusPkg = param.getArg(5) as? String
             }
         })
 
-        ModuleHelper.findAndHookMethod("com.android.server.TelephonyRegistry", lpparam.classLoader, "notifyCallState", Int::class.javaPrimitiveType, String::class.java, object : MethodHook() {
-            override fun before(param: BeforeHookCallback) {
-                removeListener(param.thisObject)
-            }
-        })
-
-        ModuleHelper.findAndHookMethod("com.android.server.TelephonyRegistry", lpparam.classLoader, "notifyCallStateForPhoneId", Int::class.javaPrimitiveType, Int::class.javaPrimitiveType, Int::class.javaPrimitiveType, String::class.java, object : MethodHook() {
-            override fun before(param: BeforeHookCallback) {
-                removeListener(param.thisObject)
-            }
-        })
     }
 
     @JvmStatic

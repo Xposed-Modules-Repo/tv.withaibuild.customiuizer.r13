@@ -8,7 +8,7 @@ REPO = Path(__file__).resolve().parent.parent.parent
 FILES = {
     "AboutFragment": REPO / "app" / "src" / "main" / "java" / "tv" / "withaibuild" / "customiuizer" / "AboutFragment.kt",
     "Credentials": REPO / "app" / "src" / "main" / "java" / "tv" / "withaibuild" / "customiuizer" / "Credentials.kt",
-    "MainActivity": REPO / "app" / "src" / "main" / "java" / "tv" / "withaibuild" / "customiuizer" / "MainActivity.kt",
+    "XposedServiceManager": REPO / "app" / "src" / "main" / "java" / "tv" / "withaibuild" / "customiuizer" / "utils" / "XposedServiceManager.kt",
     "PrefsProvider": REPO / "app" / "src" / "main" / "java" / "tv" / "withaibuild" / "customiuizer" / "PrefsProvider.kt",
     "SubFragmentWithSearch": REPO / "app" / "src" / "main" / "java" / "tv" / "withaibuild" / "customiuizer" / "SubFragmentWithSearch.kt",
     "System": REPO / "app" / "src" / "main" / "java" / "tv" / "withaibuild" / "customiuizer" / "subs" / "System.kt",
@@ -35,10 +35,10 @@ class SettingsEntrypointDiagnosticsContractTest(unittest.TestCase):
     def test_all_targets_import_settings_diagnostics(self):
         for name, text in self.texts.items():
             with self.subTest(file=name):
-                self.assertIn(
-                    "import tv.withaibuild.customiuizer.utils.SettingsDiagnostics",
-                    text,
-                )
+                if FILES[name].parent.name == "utils":
+                    self.assertIn("package tv.withaibuild.customiuizer.utils", text)
+                else:
+                    self.assertIn("import tv.withaibuild.customiuizer.utils.SettingsDiagnostics", text)
 
     def test_no_system_out_or_err(self):
         for name, text in self.texts.items():
@@ -68,7 +68,7 @@ class SettingsEntrypointDiagnosticsContractTest(unittest.TestCase):
         operations = [
             "AboutFragment.bindVersionText",
             "Credentials.initializeCredentialFlow",
-            "MainActivity.unregisterPreferenceListener",
+            "XposedServiceManager.registerService",
             "PrefsProvider.openTestAsset",
             "SubFragmentWithSearch.styleSearchView",
             "System.writeQqsCount",
@@ -88,7 +88,7 @@ class SettingsEntrypointDiagnosticsContractTest(unittest.TestCase):
         operations = [
             "AboutFragment.bindVersionText",
             "Credentials.initializeCredentialFlow",
-            "MainActivity.unregisterPreferenceListener",
+            "XposedServiceManager.registerService",
             "PrefsProvider.openTestAsset",
             "SubFragmentWithSearch.styleSearchView",
             "System.writeQqsCount",
@@ -97,6 +97,9 @@ class SettingsEntrypointDiagnosticsContractTest(unittest.TestCase):
             with self.subTest(operation=op):
                 body = self._extract_catch_body_after_call(op)
                 self.assertIsNotNone(body, f"could not find catch body for {op}")
+                if op == "XposedServiceManager.registerService":
+                    self.assertIn("RuntimeFatality.throwIfFatal(t)", body)
+                    continue
                 self.assertIn("is OutOfMemoryError", body)
                 self.assertIn("is ThreadDeath", body)
                 self.assertIn("is VirtualMachineError", body)
@@ -148,13 +151,15 @@ class SettingsEntrypointDiagnosticsContractTest(unittest.TestCase):
                 self.assertIn("startActivityForResult", body)
                 self.assertNotIn("SettingsDiagnostics", body)
 
-    def test_main_activity_ondestroy_preserved(self):
-        text = self.texts["MainActivity"]
-        catch_body = self._extract_catch_body_after_call("MainActivity.unregisterPreferenceListener")
-        self.assertIsNotNone(catch_body)
-        self.assertNotIn("super.onDestroy()", catch_body)
-        # super.onDestroy() must follow the catch.
-        self.assertIn("super.onDestroy()", text)
+    def test_service_and_preference_listeners_have_process_ownership(self):
+        service = self.texts["XposedServiceManager"]
+        main = FILES["Credentials"].parent / "MainActivity.kt"
+        app = FILES["Credentials"].parent / "MainApplication.kt"
+        self.assertNotIn("registerListener", main.read_text(encoding="utf-8"))
+        self.assertNotIn("registerOnSharedPreferenceChangeListener", main.read_text(encoding="utf-8"))
+        self.assertIn("XposedServiceManager::init", app.read_text(encoding="utf-8"))
+        self.assertIn("if (started) return", service)
+        self.assertIn("if (this.service !== service) return", service)
 
     def test_prefs_provider_mappings_and_open_fd(self):
         text = self.texts["PrefsProvider"]

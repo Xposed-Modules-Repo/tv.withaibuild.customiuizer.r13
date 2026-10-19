@@ -1,13 +1,19 @@
-# CustoMIUIzer A13
+# 米客 A13｜CustoMIUIzer A13
 
 [简体中文](README.md) | English
 
 CustoMIUIzer A13 customizes the system UI and interactions on **MIUI 14 / Android 13**, with capability-based compatibility paths for **HyperOS 1 / Android 13**. It uses an independent package, release line, and modern libxposed API.
 
-- Current version: `r13.12.0` (versionCode `138`)
+> **r13.13.0 uses a different signing certificate and cannot directly update older releases.** Export settings, uninstall the old app, install this version, restore settings and re-enable the module. See the [compatibility notes](COMPATIBILITY.md#签名与升级).
+
+> **Maintenance status**
+>
+> Actively maintained, with correctness, compatibility and stability on Android 13 taking priority.
+
+- Current version: `r13.13.0` (versionCode `141`)
 - Application ID: `tv.withaibuild.customiuizer.r13`
-- Source repository: <https://github.com/tomthenpc/customiuizer-a13>
-- User downloads: <https://github.com/Xposed-Modules-Repo/tv.withaibuild.customiuizer.r13/releases>
+- Source repository: <https://github.com/thetvplus/customiuizer-a13>
+- User downloads: <https://github.com/thetvplus/customiuizer-a13/releases>
 - Deployed framework: LSPosed / Vector
 
 ## Core Features
@@ -26,11 +32,11 @@ CustoMIUIzer A13 customizes the system UI and interactions on **MIUI 14 / Androi
 | SDK | minSdk 33 / targetSdk 34 |
 | ABI | `arm64-v8a` |
 | Xposed framework | LSPosed / Vector |
-| Module metadata | `minApiVersion=101`, `targetApiVersion=102`, `staticScope=false` |
+| Module metadata | `minApiVersion=102`, `targetApiVersion=102`, `staticScope=true` |
 
-Android 14 and later are not supported. Do not enable this module together with upstream or another CustoMIUIzer-derived module.
+Requires a framework providing libxposed API 102. Android 14 and later are not supported. Do not enable this module together with upstream or another CustoMIUIzer-derived module.
 
-Known deployed baseline: Redmi Note 11T Pro (`xaga`), MIUI `V14.0.10.0.TLOINXM`.
+Historical deployed baseline: Redmi Note 11T Pro (`xaga`), MIUI `V14.0.10.0.TLOINXM`. This is not device acceptance for `r13.13.0`.
 
 ## Runtime Architecture
 
@@ -43,7 +49,7 @@ Known deployed baseline: Redmi Note 11T Pro (`xaga`), MIUI `V14.0.10.0.TLOINXM`.
 
 See [CHANGELOG_EN.md](CHANGELOG_EN.md) for release changes and [AGENTS.md](AGENTS.md), [ARCHITECTURE.md](ARCHITECTURE.md), [COMPATIBILITY.md](COMPATIBILITY.md), and [docs/A13_PARITY.md](docs/A13_PARITY.md) for engineering rules, architecture, and compatibility.
 
-`r13.12.0` fixes gesture/custom-action values snapping back to "No action" and adds the Launcher restart control on gesture pages. It also includes USB default-mode mapping, installer purify, folder blur, backup format, and several status-bar/desktop visual capabilities. See [CHANGELOG_EN.md](CHANGELOG_EN.md).
+`r13.13.0` fixes call filtering and notification settings, consolidates installation and service lifecycles, and adopts API 102 and the current build toolchain. See [CHANGELOG_EN.md](CHANGELOG_EN.md).
 
 ## Build and verification
 
@@ -51,12 +57,15 @@ See [CHANGELOG_EN.md](CHANGELOG_EN.md) for release changes and [AGENTS.md](AGENT
 python tools/verify.py full
 ```
 
+Build tools: AGP 9.4.1, Gradle 9.8.1, Kotlin 2.4.21 (AGP built-in mode), JDK 25 and compileSdk 37. Runtime SDK bounds remain minSdk 33 / targetSdk 34. See the [build guide](docs/ENGINEERING_UPGRADE.md).
+
+
 ## Support and contact
 
 If this project helps you, you can support continued development via [PayPal](https://paypal.me/Jinjitv).
 
-- Source repository: <https://github.com/tomthenpc/customiuizer-a13>
-- User downloads: <https://github.com/Xposed-Modules-Repo/tv.withaibuild.customiuizer.r13/releases>
+- Source repository: <https://github.com/thetvplus/customiuizer-a13>
+- User downloads: <https://github.com/thetvplus/customiuizer-a13/releases>
 
 ## Development notes
 

@@ -9,7 +9,7 @@ import tv.withaibuild.customiuizer.utils.PrefMap
 /**
  * Runtime feature dispatcher.
  *
- * [FeatureDispatcher] is the hot-path entry point for installing typed catalog
+ * [FeatureDispatcher] is the cold-path entry point for installing typed catalog
  * features. It holds the smallest possible public surface:
  *
  * - [createRuntime] builds the per-process runtime context.

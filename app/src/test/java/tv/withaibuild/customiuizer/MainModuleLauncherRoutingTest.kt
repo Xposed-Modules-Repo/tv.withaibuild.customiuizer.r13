@@ -109,7 +109,7 @@ class MainModuleLauncherRoutingTest {
         fakeSharedPreferences.failFirstRegister = true
         fakeSharedPreferences.setAll(prefs)
         val module = MainModule()
-        module.attachFramework(FakeXposedInterface.create())
+        module.attachFramework(FakeXposedInterface.create()) {}
         module.onModuleLoaded(moduleLoadedParam(process))
         return module
     }
@@ -173,5 +173,15 @@ class MainModuleLauncherRoutingTest {
         assertEquals(0, attachHooks)
         assertEquals(0, resourceHookCount())
         assertEquals(0, fakeSharedPreferences.registerCount)
+    }
+
+    @Test
+    fun repeatedPackageReadyDoesNotInstallAnotherAttachHook() {
+        val module = moduleWithPrefs(mapOf("launcher_swipedown_action" to 2))
+        val param = packageReadyParam("com.miui.home", "com.miui.home")
+        module.onPackageReady(param)
+        module.onPackageReady(param)
+        assertEquals(1, FakeXposedInterface.recordedHooks.count { it.executable.name == "attach" })
+        assertEquals(1, fakeSharedPreferences.registerCount)
     }
 }

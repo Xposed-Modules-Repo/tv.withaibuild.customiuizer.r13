@@ -19,6 +19,8 @@ open class MiuiNotificationMenuRow {
     var originalClearsAndAddsSystemItems: Boolean = true
     var failGetMenuView: Boolean = false
 
+    fun onClickInfoItem(context: Context, item: Any?) {}
+
     fun createMenuViews(animate: Boolean, fromLeft: Boolean) {
         if (originalClearsAndAddsSystemItems) {
             mMenuItems.clear()
