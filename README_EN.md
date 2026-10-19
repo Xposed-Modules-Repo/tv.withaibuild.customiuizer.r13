@@ -1,55 +1,44 @@
-# CustoMIUIzer A13 | MIUI 14 / Android 13
+# 米客 A13｜CustoMIUIzer A13
 
 [简体中文](README.md) | English
 
-> **Maintenance status**
->
-> Active development has ended as the maintainer has moved to other systems.
-> The project remains available as a stable maintenance build for MIUI 14 / Android 13.
-> Future updates, if any, will be limited to critical fixes, necessary compatibility work, or actual maintainer needs.
+System UI and interaction customization for **MIUI 14 / Android 13**, with ongoing maintenance of the Android 13 line. **HyperOS 1 / Android 13 compatibility is experimental**.
 
-CustoMIUIzer A13 customizes the system UI and interactions on MIUI 14 / Android 13, with capability-based compatibility paths for HyperOS 1 / Android 13.
+[Download the latest release](https://github.com/Xposed-Modules-Repo/tv.withaibuild.customiuizer.r13/releases/latest) · [Releases](https://github.com/Xposed-Modules-Repo/tv.withaibuild.customiuizer.r13/releases) · [Source and issues](https://github.com/thetvplus/customiuizer-a13)
 
-## Current Version
+> **The signing certificate changed; older builds cannot be updated in place.** The previous A13 key is currently unavailable. Successfully export settings to Downloads or Documents before uninstalling, then install this build, restore settings, re-enable the module and reboot. Keep the old app if backup fails.
+
+## Current version
 
 | Item | Value |
 | --- | --- |
-| Version | `r13.12.2` |
-| versionCode | `140` |
+| Version | `r13.13.0` (versionCode `141`) |
 | Application ID | `tv.withaibuild.customiuizer.r13` |
 | ABI | `arm64-v8a` |
-| Deployed framework | LSPosed / Vector |
-| Source | <https://github.com/tomthenpc/customiuizer-a13> |
+| Framework | LSPosed / Vector providing libxposed API 102 |
+| Source tag | [r13.13.0](https://github.com/thetvplus/customiuizer-a13/tree/r13.13.0) |
+| APK | `CustoMIUIzer-A13-r13.13.0.apk`, identical in both repositories |
 
-## Compatibility and Requirements
+This release fixes settings backup, call filtering and notification settings, and unifies hook installation, service binding and preference-listener lifecycles. See [CHANGELOG_EN.md](CHANGELOG_EN.md).
 
-- MIUI 14 / Android 13 is the primary compatibility target;
-- HyperOS 1 / Android 13 selects compatibility paths through ROM Contracts and target capability detection; feature availability depends on the ROM and system-app versions;
-- The device must be rooted and run a LSPosed / Vector framework;
-- Module metadata: `minApiVersion=101`, `targetApiVersion=102`, `staticScope=false`;
-- Android 14 and later are not supported;
-- Do not enable this module together with the upstream or another CustoMIUIzer-derived module.
+## Compatibility
 
-Known deployed baseline: Redmi Note 11T Pro (`xaga`), MIUI `V14.0.10.0.TLOINXM`.
+- MIUI 14 / Android 13 is the primary target; HyperOS 1 / Android 13 feature availability depends on the ROM and system-app versions.
+- Requires root, an `arm64-v8a` device and libxposed API 102. API 101-only frameworks are no longer supported.
+- Module metadata: `minApiVersion=102`, `targetApiVersion=102`, `staticScope=true`.
+- Android 14+ is unsupported. Do not enable alongside upstream or other CustoMIUIzer variants.
 
-## Main Features
+## Main features
 
-- Status-bar clock, date, temperature, network speed, battery, signal, and icon layout;
-- Control center, notifications, volume, brightness, lock screen, media, and charging UI;
-- Launcher icons, folders, Dock, recents, gestures, and animations;
-- Navigation keys, button actions, power menu, floating windows, multi-window behavior, installer, sharing, and app permissions.
-
-`r13.12.2` supersedes `r13.12.0` / `r13.12.1`. This final release adds USB default mode, installer purify, Launcher dock height, hiding the IME dismiss button, status-bar visual options, folder-blur disable, Backup V2 with legacy restore, BatteryIndicator custom colors, and dim-ratio adjustment, and fixes MultiAction / gesture persistence, spinner OOB, Launcher restart scope, USB replug latch, app/shortcut/Activity result relay, and final MultiAction result delivery. See [CHANGELOG_EN.md](CHANGELOG_EN.md) for details.
+- Status-bar clock, date, temperature, network speed, battery, signal and icon layout;
+- Control center, notifications, volume, brightness, lock screen, media and charging UI;
+- Launcher icons, folders, Dock, recents, gestures and animations;
+- Navigation keys, button actions, power menu, floating windows, multi-window, installer, sharing and app permissions.
 
 ## Installation
 
-1. Install a LSPosed / Vector framework;
-2. Download and install the APK from the latest Release in this repository;
-3. Enable the module in the LSPosed / Vector framework and confirm the recommended scope;
-4. Open module settings once, then fully reboot the device.
+1. Confirm API 102 framework support and download the APK from this repository's Release. Existing users must back up and uninstall as described above.
+2. Install, enable the module and confirm the recommended scope.
+3. Open module settings, restore settings if upgrading, then fully reboot the device.
 
-## Issue Reporting
-
-Feature compatibility depends on the ROM and system-app versions. If a problem occurs, disable the related feature first and provide the device, ROM, framework version, scope, reproduction steps, and relevant logs.
-
-Source and issue reporting: <https://github.com/tomthenpc/customiuizer-a13>
+Static checks, unit tests, lint, R8 and CI passed. This version has not completed A13 device acceptance. If a feature fails, disable it and report your device, ROM, framework version, scope, reproduction steps and relevant logs.

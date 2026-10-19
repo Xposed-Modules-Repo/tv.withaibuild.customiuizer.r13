@@ -2,6 +2,25 @@
 
 简体中文 | [English](CHANGELOG_EN.md)
 
+## r13.13.0 — 2026-10-19
+
+`versionCode 141`，基于 `r13.12.2` 的维护更新。
+
+> **签名已变更，不能直接覆盖旧版。** 原 A13 发布密钥目前无法取得。请先将设置备份成功导出到下载或文档目录，再卸载旧版、安装新版、恢复备份，重新启用模块并重启。备份失败时请保留旧版。
+
+- 修复长偏好键导致设置备份失败的问题（[Issue #12](https://github.com/thetvplus/customiuizer-a13/issues/12)）。
+- 修复来电过滤、通知渠道设置跳转与多用户归属。
+- 统一 Hook 安装、Service 连接和偏好监听的生命周期，处理重复注册、初始化竞争与失败状态。
+- 全面使用 libxposed API 102，更新构建工具链，精简重复脚本和历史文档。
+
+需要 **MIUI 14 / Android 13、arm64-v8a、libxposed API 102**。HyperOS 1 / Android 13 仍为实验兼容；仅提供 API 101 的框架不再受支持。
+
+静态检查、单元测试、lint、R8 与 CI 已通过；本版尚未完成 A13 实机验收。
+
+[完整变更](https://github.com/thetvplus/customiuizer-a13/blob/r13.13.0/CHANGELOG.md)
+
+APK：`CustoMIUIzer-A13-r13.13.0.apk` / SHA-256 `b064712965098b9013a27dc448478afdf208c150aea00654960834b87a5dc47c`
+
 ## r13.12.2 — 2026-08-19
 
 `versionCode 140`，r13.12 系列最终稳定版本，已包含并取代 `r13.12.0` / `r13.12.1`。

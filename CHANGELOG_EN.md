@@ -2,6 +2,25 @@
 
 [简体中文](CHANGELOG.md) | English
 
+## r13.13.0 — 2026-10-19
+
+`versionCode 141`, a maintenance update based on `r13.12.2`.
+
+> **The signing certificate changed; older builds cannot be updated in place.** The previous A13 key is currently unavailable. Successfully export settings to Downloads or Documents before uninstalling, then install this build, restore settings, re-enable the module and reboot. Keep the old app if backup fails.
+
+- Fixed settings backup failing on long preference keys ([Issue #12](https://github.com/thetvplus/customiuizer-a13/issues/12)).
+- Fixed call filtering, notification-channel settings navigation and user selection.
+- Unified hook installation, service binding and preference-listener lifecycles to address duplicate registration, initialization races and failure states.
+- Moved fully to libxposed API 102, updated the build toolchain and removed duplicate scripts and historical documents.
+
+Requires **MIUI 14 / Android 13, arm64-v8a and libxposed API 102**. HyperOS 1 / Android 13 remains experimental; API 101-only frameworks are no longer supported.
+
+Static checks, unit tests, lint, R8 and CI passed. This version has not completed A13 device acceptance.
+
+[Full changelog](https://github.com/thetvplus/customiuizer-a13/blob/r13.13.0/CHANGELOG_EN.md)
+
+APK: `CustoMIUIzer-A13-r13.13.0.apk` / SHA-256 `b064712965098b9013a27dc448478afdf208c150aea00654960834b87a5dc47c`
+
 ## r13.12.2 — 2026-08-19
 
 `versionCode 140`, the final stable release in the r13.12 series. Supersedes `r13.12.0` / `r13.12.1`.
