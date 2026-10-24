@@ -14,6 +14,7 @@ import tv.withaibuild.customiuizer.utils.AppHelper
 import tv.withaibuild.customiuizer.utils.Helpers
 import tv.withaibuild.customiuizer.utils.SettingsDiagnostics
 import java.util.IllegalFormatException
+import java.lang.ref.WeakReference
 
 class SeekBarPreference @JvmOverloads constructor(
     context: Context,
@@ -45,8 +46,10 @@ class SeekBarPreference @JvmOverloads constructor(
     private var mSteppedMinValue: Int
     private var mSteppedMaxValue: Int
 
-    private var mValue: TextView? = null
-    private var mSeekBar: SeekBar? = null
+    private var mValue: WeakReference<TextView>? = null
+    private var mSeekBar: WeakReference<SeekBar>? = null
+    private var currentValue: Int? = null
+    private var savedValue: Int? = null
     private var mListener: SeekBar.OnSeekBarChangeListener? = null
 
     init {
@@ -101,7 +104,7 @@ class SeekBarPreference @JvmOverloads constructor(
 
     fun getView(finalView: View) {
         val title = finalView.findViewById<TextView>(android.R.id.title) ?: return
-        mSeekBar?.alpha = if (isEnabled) 1.0f else 0.75f
+        boundSeekBar()?.alpha = if (isEnabled) 1.0f else 0.75f
         title.text = (getTitle()?.toString() ?: "") + if (unsupported) " ⨯" else if (dynamic) " ⟲" else ""
         if (newmod) Helpers.applyNewMod(title)
         if (highlight) {
@@ -131,20 +134,17 @@ class SeekBarPreference @JvmOverloads constructor(
             noteView?.text = mNote
         }
 
-        mValue = view.findViewById(R.id.seekbar_value) as? TextView
-        mSeekBar = view.findViewById(R.id.seekbar) as? SeekBar
+        val valueView = view.findViewById(R.id.seekbar_value) as? TextView
+        val seekBar = view.findViewById(R.id.seekbar) as? SeekBar
+        mValue = valueView?.let { WeakReference(it) }
+        mSeekBar = seekBar?.let { WeakReference(it) }
         // A recycled row may still carry another preference's listener.
-        mSeekBar?.setOnSeekBarChangeListener(null)
-        mSeekBar?.max = mSteppedMaxValue - mSteppedMinValue
+        seekBar?.setOnSeekBarChangeListener(null)
+        seekBar?.setTag(R.id.seekbar, this)
+        seekBar?.max = mSteppedMaxValue - mSteppedMinValue
+        setValue(getValue())
 
-        val key = getKey()
-        if (key != null) {
-            setValue(AppHelper.getIntOfAppPrefs(key, mDefaultValue))
-        } else {
-            setValue(mDefaultValue)
-        }
-
-        mSeekBar?.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+        seekBar?.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onStopTrackingTouch(seekBar: SeekBar) {
                 mListener?.onStopTrackingTouch(seekBar)
                 saveValue()
@@ -155,6 +155,8 @@ class SeekBarPreference @JvmOverloads constructor(
             }
 
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                getValue() // Rebase external changes before applying this new gesture value.
+                currentValue = (progress + mSteppedMinValue) * mStepValue
                 mListener?.onProgressChanged(seekBar, getValue(), fromUser)
                 updateDisplay(progress)
             }
@@ -171,22 +173,25 @@ class SeekBarPreference @JvmOverloads constructor(
     fun getMinValue(): Int = mMinValue
 
     fun setMinValue(value: Int) {
+        val current = getValue()
         mMinValue = value
-        updateAllValues()
+        updateAllValues(current)
     }
 
     fun getMaxValue(): Int = mMaxValue
 
     fun setMaxValue(value: Int) {
+        val current = getValue()
         mMaxValue = value
-        updateAllValues()
+        updateAllValues(current)
     }
 
     fun getStepValue(): Int = mStepValue
 
     fun setStepValue(value: Int) {
-        mStepValue = value
-        updateAllValues()
+        val current = getValue()
+        mStepValue = value.coerceAtLeast(1)
+        updateAllValues(current)
     }
 
     fun getFormat(): String? = mFormat
@@ -201,16 +206,29 @@ class SeekBarPreference @JvmOverloads constructor(
     }
 
     fun getValue(): Int {
-        return mSeekBar?.let { (it.progress + mSteppedMinValue) * mStepValue } ?: mDefaultValue
+        val saved = key?.let { AppHelper.getIntOfAppPrefs(it, mDefaultValue) } ?: mDefaultValue
+        // External writes and backup restore invalidate an in-progress local value.
+        // SharedPreferences reads its memory snapshot; no listener or View is owned here.
+        if (savedValue != saved) {
+            savedValue = saved
+            currentValue = null
+        }
+        return currentValue ?: (getBoundedValue(saved) * mStepValue)
     }
+
+    // A preference can outlive its Fragment View or the row now bound to another key.
+    private fun boundSeekBar(): SeekBar? =
+        mSeekBar?.get()?.takeIf { it.getTag(R.id.seekbar) === this }
 
     fun setValue(value: Int) {
         setValue(value, false)
     }
 
     fun setValue(value: Int, save: Boolean) {
+        getValue() // Capture the saved baseline before keeping an unsaved programmatic value.
         val bounded = getBoundedValue(value) - mSteppedMinValue
-        mSeekBar?.progress = bounded
+        currentValue = (bounded + mSteppedMinValue) * mStepValue
+        boundSeekBar()?.progress = bounded
         updateDisplay(bounded)
         if (save) {
             saveValue()
@@ -221,20 +239,13 @@ class SeekBarPreference @JvmOverloads constructor(
         mDefaultValue = value
     }
 
-    private fun updateAllValues() {
-        var currentValue = getValue()
+    private fun updateAllValues(currentValue: Int) {
         if (mMaxValue <= mMinValue) mMaxValue = mMinValue + 1
         mSteppedMinValue = Math.round(mMinValue.toFloat() / mStepValue)
         mSteppedMaxValue = Math.round(mMaxValue.toFloat() / mStepValue)
 
-        mSeekBar?.max = mSteppedMaxValue - mSteppedMinValue
-
-        currentValue = getBoundedValue(currentValue) - mSteppedMinValue
-
-        mSeekBar?.let {
-            it.progress = currentValue
-            updateDisplay(currentValue)
-        }
+        boundSeekBar()?.max = mSteppedMaxValue - mSteppedMinValue
+        setValue(currentValue)
     }
 
     private fun getBoundedValue(value: Int): Int {
@@ -245,11 +256,12 @@ class SeekBarPreference @JvmOverloads constructor(
     }
 
     private fun updateDisplay() {
-        mSeekBar?.progress?.let { updateDisplay(it) }
+        updateDisplay(getBoundedValue(getValue()) - mSteppedMinValue)
     }
 
     private fun updateDisplay(value: Int) {
-        val valueView = mValue ?: return
+        if (boundSeekBar() == null) return
+        val valueView = mValue?.get() ?: return
         if (!mFormat.isNullOrEmpty()) {
             valueView.visibility = View.VISIBLE
             var display = (value + mSteppedMinValue) * mStepValue
@@ -281,7 +293,13 @@ class SeekBarPreference @JvmOverloads constructor(
 
     private fun saveValue() {
         val key = getKey() ?: return
-        AppHelper.appPrefs?.edit()?.putInt(key, getValue())?.apply()
+        try {
+            AppHelper.appPrefs?.edit()?.putInt(key, getValue())?.apply()
+        } finally {
+            // apply() updates memory synchronously. A missing/failed writer must not
+            // leave the attempted value masquerading as the stored configuration.
+            currentValue = null
+        }
     }
 
     fun setUnsupported(value: Boolean) {
